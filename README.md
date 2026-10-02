@@ -2,7 +2,7 @@
 
 Give the plugin an original PDF or Word CV and receive an editable **BTO .docx**, with the original banner, Century Gothic typography, measured spacing and real square bullet lists.
 
-Version 2 uses native Word templates derived from the supplied M.M. and D.P. references. M.M. is the consistent default; D.P. is an optional layout. The original candidate files are not distributed.
+Version 3 uses one native Word template derived exclusively from D.P. The original D.P. banner, square list markers, first-job indentation, later-job alignment and paragraph spacing are retained. There is no layout switch. The original candidate files are not distributed.
 
 ## Start here
 
@@ -16,7 +16,7 @@ Once installed, start a new chat, select **BTO CV** from the plugin menu, attach
 
 > Convert this original CV into an editable BTO Word document using the latest template.
 
-**Only need the install screen?** After marketplace registration, use [Install BTO CV](codex://plugins/install/bto-cv?marketplace=bto-cv-marketplace), or open Plugins â†’ BTO CV Marketplace â†’ BTO CV. Some browsers do not open app links; use the plugin menu instead.
+**Only need the install screen?** After marketplace registration, use [Install BTO CV](codex://plugins/install/bto-cv?marketplace=bto-cv-marketplace), or open Plugins Ã¢â€ â€™ BTO CV Marketplace Ã¢â€ â€™ BTO CV. Some browsers do not open app links; use the plugin menu instead.
 
 ## Test it without personal data
 
@@ -61,10 +61,10 @@ This private marketplace requires initial GitHub access and marketplace registra
 
 ## Exact formatting and conversion
 
-The generator clones native Word paragraph prototypes and preserves the embedded banner, numbering, styles and page settings. It does not convert HTML to Word. IT skills, education, certificates and languages use native bullets as well as job responsibilities. Body content remains editable. Different candidate lengths naturally change pagination; fonts and rendering software can also affect page breaks. The two supplied references contain small layout differences, documented in `skills/bto-cv/references/format.md`.
+The generator clones native Word paragraph prototypes and preserves the embedded banner, numbering, styles and page settings. It does not convert HTML to Word. IT skills, education, certificates and languages use native bullets as well as job responsibilities. Body content remains editable. Different candidate lengths naturally change pagination; fonts and rendering software can also affect page breaks. D.P. is the only formatting authority, documented in `skills/bto-cv/references/format.md`.
 
 The agent extracts candidate information into temporary JSON and runs the bundled Python 3 generator. Users only provide their original CV; they do not need to prepare JSON. Optional HTML is a secondary preview and cannot override the Word master.
 
-Developer check: `python -m unittest discover -s tests` verifies package preservation, native numbering, text escaping, optional sections and overwrite protection. The one-page fictional result and both three-page reference-content results were rendered and inspected with Microsoft Word. Keep these candidate-content QA files local.
+Developer check: `python -m unittest discover -s tests` verifies package preservation, native numbering, text escaping, optional sections and overwrite protection. The corrected fictional result and the D.P. reference-content replay are validated with Microsoft Word. Keep these candidate-content QA files local.
 
 For layout updates, retain the placeholder tokens in the DOCX master. For code or rule changes, bump the plugin version and update the installed plugin.

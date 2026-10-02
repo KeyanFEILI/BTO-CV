@@ -1,26 +1,28 @@
-# BTO formatting contract
+# D.P. formatting contract
 
-Design authority: BTO_CV_M.M.docx and BTO_CV_D.P.docx supplied 2 October 2026. Both were rendered with Microsoft Word and all three pages of each inspected. Originals stay local; packaged masters are anonymized derivatives.
+The sole design authority is BTO_CV_D.P.docx supplied by the user. The packaged master is an anonymized derivative. Never blend another CV's layout, recreate bullets, apply generic Word styles or use HTML-to-DOCX conversion.
 
-Default layout is M.M: consistent title/body indentation. DP preserves its unindented headings and category labels and its extra gap after WORK EXPERIENCE. The references differ, so they cannot both define one pixel-identical layout. Never promise identical pagination for different candidate text or a different font/rendering environment.
+- Letter portrait: 12240 x 15840 twips; top/bottom 648, left/right 792; header/footer distances 720. One section, no page numbers, tables or repeating banner.
+- Preserve the original inline banner image and drawing: 6126480 x 783386 EMU. The source banner paragraph's centered alignment and indentation are retained.
+- Initials: centered, bold Century Gothic 16 pt, no paragraph indentation.
+- Body: Century Gothic 11 pt; source single line spacing, zero space after. Dates and roles bold, employer regular; Main responsibilities: bold and underlined.
+- Headings: Century Gothic 13 pt bold, #00665E, uppercase, unindented. Order: WORK EXPERIENCE, EDUCATION, IT SKILLS, CERTIFICATIONS AND TRAINING, LANGUAGES. Empty optional sections are omitted.
+- First job's date, role, employer and responsibility label: left 426 twips, hanging 284. Subsequent jobs have no indentation. Skills category labels have no indentation.
+- Native Word square lists: numId 1, level 0, abstractNum 9; U+25AA in Tw Cen MT. Bullet paragraphs have left 567 twips, hanging 387 (marker at 180, text at 567), keepLines and source line spacing. Responsibilities, education, skills, certifications and languages all use these native lists. No literal bullet prefixes in candidate text.
+- Retain source keepNext settings for headings and job/category labels. Do not force a page count or shrink fonts to fit.
+- Preserve distinct blank paragraph prototypes: regular body gap, 13 pt bold heading gap after WORK EXPERIENCE, and the list gap after experience/certifications and at the document end. D.P.'s first job ends in a trailing line break before the second job; subsequent jobs use one empty body paragraph. Between sections use the two source blank paragraphs, including the list-gap variant where applicable.
+- Preserve supplied content; different text lengths naturally change wrapping and pagination. Equivalent rendering requires Century Gothic and Tw Cen MT. Report font substitution.
 
-- Letter portrait: 12240 x 15840 twips; top/bottom 648 (.45 in), left/right 792 (.55 in); one column. Header/footer distances 720; no repeated banner, page numbers, tables, or added header/footer.
-- Banner: original embedded image retained byte-for-byte; inline drawing 6126480 x 783386 EMU (6.7 x .85672 in), centered in first body paragraph. Never redraw, crop, stretch, or repeat it on later pages.
-- Candidate title: initials such as A.E., centered, bold 16 pt Century Gothic. No photo/contact block unless explicitly requested.
-- Body: Century Gothic 11 pt, black. Single line spacing (240 auto), zero space after. Dates and role bold; employer regular; Main responsibilities: bold and underlined.
-- Section headings: 13 pt bold Century Gothic, #00665E, uppercase, source order WORK EXPERIENCE; EDUCATION; IT SKILLS; CERTIFICATIONS AND TRAINING; LANGUAGES.
-- M.M regular paragraph indentation: left 426 twips, hanging 284 (first line starts 142 twips from margin). DP headings/categories have no indent. Cloned role prototypes retain their exact properties.
-- Lists: native w:numPr level 0 numId 1, resolved to square-bullet definition. Marker is U+25AA in numbering, not typed text. Paragraph left 567 twips, hanging 387; marker starts 180 twips from margin, text 567. KeepLines true. No extra spacing between bullets. Education, skill content, certificates and languages are all real bullets too.
-- KeepNext on headings, date, role, employer, responsibility label and skill category. Do not keep entire jobs together; long jobs can span pages, with each bullet kept intact when possible.
-- One empty body line after initials and between jobs; two between major sections. DP adds a line after first section heading. These normalize inconsistent incidental blank lines in the references without shrinking or imposing a page limit.
-- IT SKILLS uses bold category labels followed by one or more square bullet paragraphs. Preserve project evidence under a relevant category when supplied.
+## Master and compatibility
 
-## Slots and package preservation
+The only master is assets/BTO_CV_Template.docx. There is no layout selector. Version 3 adds distinct first-job, later-job and blank-paragraph slots; older masters must fail validation instead of falling back to another layout.
 
-assets/BTO_CV_Template.docx is the default; BTO_CV_Template_DP.docx is optional. Exact paragraph tokens in word/document.xml locate initials, gap, dates, role, employer, responsibilities, experience_bullet, education_bullet, skill_category, skill_bullet, certification_bullet, language_bullet. Fixed heading text locates heading prototypes. First paragraph contains the banner; final sectPr controls page geometry.
+The slots are initials, gap, heading_gap, list_gap, first_dates, first_role, first_employer, first_responsibilities, first_last_bullet, dates, role, employer, responsibilities, experience_bullet, education_bullet, skill_category, skill_bullet, certification_bullet and language_bullet. Fixed heading text identifies section prototypes. Preserve all tokens when editing the master.
 
-The generator clones these source paragraphs and replaces their runs' text. It changes only word/document.xml in the selected anonymized master; styles, numbering, theme, drawing relationships, image bytes and section properties are preserved. Template preparation removed personal text, bibliography storage and identifying document properties. No source candidate records may be committed.
+The generator changes only word/document.xml. Styles, numbering, theme, relationships and image bytes remain unchanged. The banner and section properties are cloned unchanged. Template preparation removed personal content, bibliography storage and identifying metadata. Never commit source candidate CVs or generated candidate output.
+
+HTML is only a browser approximation. It cannot replace the native Word master or determine the DOCX's formatting.
 
 ## Verification
 
-Validate native lists, section geometry, all remaining package parts, literal text preservation and absence of placeholders. Render with installed Microsoft Word when available, or a supported document renderer; inspect every page. The bundled renderer was unavailable on the maintainer machine, so Microsoft Word was used. Do not claim a render passed from XML checks alone. Century Gothic and the list-marker font Tw Cen MT must resolve for equivalent appearance; report substitutions rather than silently accepting them.
+Run the automated tests, then render with Microsoft Word or a supported document renderer and inspect every page. For design changes, replay D.P.'s content locally and compare against the original's rendered pages. Verify bullet glyph, font, indentation, first/subsequent-job distinction, blank-line variants and unchanged package parts. Pixel comparisons must use the same renderer, fonts and resolution. Keep candidate-content QA files local. XML checks alone do not prove visual equivalence.

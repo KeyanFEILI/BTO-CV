@@ -52,9 +52,9 @@ def normalize(data):
     if not any(result[k] for k in allowed-{'initials'}): raise ValueError('No CV content supplied')
     return result
 
-def build(data, output, layout='mm', template=None):
+def build(data, output, template=None):
     data=normalize(data)
-    template=Path(template) if template else Path(__file__).resolve().parents[1]/'assets'/('BTO_CV_Template_DP.docx' if layout=='dp' else 'BTO_CV_Template.docx')
+    template=Path(template) if template else Path(__file__).resolve().parents[1]/'assets'/'BTO_CV_Template.docx'
     output=Path(output)
     if output.suffix.lower()!='.docx': raise ValueError('Output must end in .docx')
     if output.resolve()==template.resolve(): raise ValueError('Never overwrite the master template')
@@ -64,7 +64,7 @@ def build(data, output, layout='mm', template=None):
     body=doc.getElementsByTagNameNS(W,'body')[0]
     paras=children(body,'p');sect=children(body,'sectPr')[0].cloneNode(True)
     prototypes={text(p):p for p in paras}
-    required=['initials','gap','dates','role','employer','responsibilities','experience_bullet','education_bullet','skill_category','skill_bullet','certification_bullet','language_bullet']
+    required=['heading_gap','list_gap','first_dates','first_role','first_employer','first_responsibilities','first_last_bullet','initials','gap','dates','role','employer','responsibilities','experience_bullet','education_bullet','skill_category','skill_bullet','certification_bullet','language_bullet']
     for slot in required:
         if '{{'+slot+'}}' not in prototypes: raise ValueError('Template slot missing: '+slot)
     for heading in HEADINGS:
@@ -78,6 +78,7 @@ def build(data, output, layout='mm', template=None):
         if value is not None:
             runs=children(p,'r');rp=children(runs[0],'rPr') if runs else []
             rp=rp[0].cloneNode(True) if rp else None
+            tails=[r.cloneNode(True) for r in runs if r.getElementsByTagNameNS(W,'br') and not r.getElementsByTagNameNS(W,'t')]
             for c in list(p.childNodes):
                 if c.nodeType!=c.ELEMENT_NODE or c.localName!='pPr':p.removeChild(c)
             r=doc.createElementNS(W,'w:r')
@@ -86,27 +87,33 @@ def build(data, output, layout='mm', template=None):
             for i,line in enumerate(value.replace('\r\n','\n').split('\n')):
                 if i:r.appendChild(doc.createElementNS(W,'w:br'))
                 t=doc.createElementNS(W,'w:t');t.setAttribute('xml:space','preserve');t.appendChild(doc.createTextNode(line));r.appendChild(t)
-            p.appendChild(r)
+            if value:
+                p.appendChild(r)
+                for tail in tails:p.appendChild(tail)
         body.appendChild(p)
     def slot(name,value):emit('{{'+name+'}}',value)
     def gap(count=1):
         for _ in range(count):slot('gap','')
     slot('initials',data['initials']);gap()
-    section_count=0
+    previous=None
     def heading(name):
-        nonlocal section_count
-        if section_count:gap(2)
-        emit(name);section_count+=1
+        nonlocal previous
+        if previous:
+            if previous in [HEADINGS[0],HEADINGS[3]]:slot('list_gap','');gap()
+            else:gap(2)
+        emit(name);previous=name
     if data['experience']:
-        heading(HEADINGS[0])
-        if layout=='dp':gap()
+        heading(HEADINGS[0]);slot('heading_gap','')
         for i,job in enumerate(data['experience']):
-            if i:gap()
+            if i and (i!=1 or not data['experience'][0]['bullets']):gap()
+            prefix='first_' if i==0 else ''
             for key in ['dates','role','employer']:
-                if job[key]:slot(key,job[key])
+                if job[key]:slot(prefix+key,job[key])
             if job['bullets']:
-                slot('responsibilities','Main responsibilities:')
-                for b in job['bullets']:slot('experience_bullet',b)
+                slot(prefix+'responsibilities','Main responsibilities:')
+                for j,b in enumerate(job['bullets']):
+                    key='first_last_bullet' if i==0 and j==len(job['bullets'])-1 and len(data['experience'])>1 else 'experience_bullet'
+                    slot(key,b)
     if data['education']:
         heading(HEADINGS[1])
         for b in data['education']:slot('education_bullet',b)
@@ -119,6 +126,7 @@ def build(data, output, layout='mm', template=None):
         if data[key]:
             heading(title)
             for b in data[key]:slot(role,b)
+    if previous==HEADINGS[4]:slot('list_gap','')
     body.appendChild(sect)
     parts['word/document.xml']=doc.toxml(encoding='UTF-8')
     output.parent.mkdir(parents=True,exist_ok=True)
@@ -130,10 +138,9 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('input',type=Path,help='Normalized UTF-8 candidate JSON')
     parser.add_argument('output',type=Path,help='New .docx output file')
-    parser.add_argument('--layout',choices=['mm','dp'],default='mm')
     parser.add_argument('--template',type=Path,help='Explicit approved DOCX master')
     args=parser.parse_args()
-    try:build(json.loads(args.input.read_text(encoding='utf-8-sig')),args.output,args.layout,args.template)
+    try:build(json.loads(args.input.read_text(encoding='utf-8-sig')),args.output,args.template)
     except (ValueError,KeyError,OSError,zipfile.BadZipFile) as error:parser.exit(1,str(error)+'\n')
     print('Created '+str(args.output))
 

@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "bto-cv",
-  "version": "2.0.0",
-  "description": "Convert original CVs into editable BTO Word documents using reference-derived formatting and native bullet lists.",
+  "version": "3.0.0",
+  "description": "Convert original CVs into editable BTO Word documents using the D.P. template and its native square bullet lists.",
   "author": {
     "name": "Keyan FEILI"
   },

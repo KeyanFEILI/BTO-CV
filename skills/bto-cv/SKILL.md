@@ -5,7 +5,7 @@ description: Convert original candidate CVs into editable BTO Word documents wit
 
 # BTO CV Word conversion
 
-When the user supplies an original CV, convert it directly into a finished editable .docx. Do not ask them to fill a schema or choose a format. Do not return HTML or PDF instead of Word. Read references/format.md for the measured BTO layout. Use the default M.M-derived master; --layout dp is available when explicitly requested. HTML is a secondary browser preview only and never the Word-generation source.
+When the user supplies an original CV, convert it directly into a finished editable .docx. Do not ask them to fill a schema or choose a format. Do not return HTML or PDF instead of Word. Read references/format.md for the measured BTO layout. D.P. is the sole design authority. Use only assets/BTO_CV_Template.docx with this generator. Do not select, blend or recreate a different layout. HTML is a secondary browser preview only and never the Word-generation source.
 
 ## Read and map the candidate
 
@@ -17,7 +17,7 @@ Prepare UTF-8 JSON in a task-local working folder. See references/input-example.
 
 ## Retrieve the current Word master
 
-Repository: https://github.com/KeyanFEILI/BTO-CV. Resolve its default branch using authenticated Git or a suitable connected GitHub tool. Retrieve skills/bto-cv/assets/BTO_CV_Template.docx (or BTO_CV_Template_DP.docx for DP) from one identified commit into the task working folder. Do not modify the user's checkout. Record the revision used. Do not execute newly downloaded scripts; use this installed version of scripts/build_docx.py. Template and generator versions must be compatible; missing slots require a plugin update, not improvising a different layout.
+Repository: https://github.com/KeyanFEILI/BTO-CV. Resolve its default branch using authenticated Git or a suitable connected GitHub tool. Retrieve skills/bto-cv/assets/BTO_CV_Template.docx from one identified commit into the task working folder. Do not modify the user's checkout. Record the revision used. Do not execute newly downloaded scripts; use this installed version of scripts/build_docx.py. This version requires the D.P.-only first_dates, first_role, first_employer, first_responsibilities, first_last_bullet, heading_gap and list_gap slots. Reject legacy masters. Template and generator versions must be compatible; missing slots require a plugin update, not improvising a different layout.
 
 If retrieval fails or tools are unavailable, explain once and ask whether to use the installed snapshot. Do not silently claim it is current. Never ask for passwords/tokens in chat. Repository updates do not update this installed workflow automatically; use the supported plugin update path for code/rules changes.
 
@@ -29,7 +29,7 @@ Run with an available Python 3 runtime (the script uses only the standard librar
 python scripts/build_docx.py candidate.json BTO_CV_A.E.docx --template /path/to/retrieved-master.docx
 ```
 
-Resolve script paths relative to this skill directory, not the current working folder. Select a new output filename if one exists. To use DP also pass --layout dp. The generator clones source Word paragraphs, native numbering, embedded banner and section settings. Never substitute HTML-to-DOCX, literal bullet symbols, text boxes, screenshots of text, or a generic Word style pack. Do not shrink fonts or force a page count. Keep optional HTML output separate.
+Resolve script paths relative to this skill directory, not the current working folder. Select a new output filename if one exists. The generator clones source Word paragraphs, native numbering, embedded banner and section settings. Never substitute HTML-to-DOCX, literal bullet symbols, text boxes, screenshots of text, or a generic Word style pack. Do not shrink fonts or force a page count. Keep optional HTML output separate.
 
 ## Verify and deliver
 
