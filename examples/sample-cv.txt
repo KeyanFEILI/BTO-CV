@@ -1,0 +1,15 @@
+FICTIONAL TEST DATA - NOT A REAL CANDIDATE
+
+Name: Alex Example
+Work experience:
+January 2025 - Present: Product Owner, Example Company
+- Manage product priorities and coordinate an engineering team.
+- Delivered an internal planning tool.
+January 2023 - December 2024: Business Analyst, Example Consulting
+- Gathered business requirements and documented acceptance criteria.
+Education: BSc Computer Science, Example University, 2022
+IT skills: Scrum, Kanban, Jira, Confluence, SQL, HTML
+Training: Product Fundamentals, Example Academy, 2024
+Languages: English (Fluent), French (Intermediate)
+
+Do not infer additional qualifications, metrics, contact details or experience.

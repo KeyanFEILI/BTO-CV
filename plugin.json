@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "bto-cv",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Convert supplied CVs into BTO-branded HTML using the maintained company template.",
   "author": {
     "name": "Keyan FEILI"
@@ -14,9 +14,11 @@
         "shortDescription": "Create BTO-branded CVs from supplied candidate information.",
         "category": "Productivity",
         "defaultPrompt": [
-          "Convert the attached CV into BTO HTML format."
+          "Convert the attached CV into BTO HTML format using the latest template.",
+          "Create a fictional BTO CV to test the template and print layout."
         ],
-        "brandColor": "#00665E"
+        "brandColor": "#00665E",
+        "longDescription": "Convert supplied Word, PDF or text CVs into BTO-branded HTML. Retrieves the maintained template when GitHub access is available, preserves supplied facts, and supports editing and printing in a browser."
       }
     }
   }

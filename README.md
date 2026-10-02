@@ -1,58 +1,58 @@
-# BTO CV Marketplace
+# BTO CV
 
-An installable BTO CV plugin for supported local Codex desktop environments. It converts supplied CVs into self-contained BTO-branded HTML. This private repository marketplace is separate from the public ChatGPT plugin directory; ordinary ChatGPT desktop access alone does not guarantee support.
+Turn a supplied CV into BTO-branded HTML, with browser editing and print-to-PDF support.
 
-## Install on a colleague's account
+## Start here
 
-1. The repository owner invites the colleague's GitHub account to this private repository. The colleague accepts and signs into GitHub using their normal local Git authentication.
-2. In a terminal with Codex CLI available, register this marketplace:
+Accept the owner's GitHub invitation to this private repository first. You need a local Codex environment that supports plugins and authenticated Git access; installing the ordinary ChatGPT desktop app alone is not enough.
 
-   ```sh
-   codex plugin marketplace add https://github.com/KeyanFEILI/BTO-CV.git --ref main
-   ```
+Copy this message into a local Codex chat:
 
-   Alternatively, ask a local Codex chat to run that command. No passwords or tokens should be pasted into a chat.
-3. Restart the desktop app. In Plugins, choose **BTO CV Marketplace**, then install **BTO CV**. This link can open installation after registration:
+> Install BTO CV from https://github.com/KeyanFEILI/BTO-CV.git. First check whether bto-cv@bto-cv-marketplace is already installed. If not, register the marketplace using `codex plugin marketplace add https://github.com/KeyanFEILI/BTO-CV.git --ref main`, then run `codex plugin add bto-cv@bto-cv-marketplace`. Stop and explain if repository access or the required commands are unavailable. Verify that the plugin is installed and enabled. If a standalone bto-cv skill exists, preserve it until the plugin is verified, then help me retire that duplicate. Do not ask me to paste passwords or tokens. Tell me when to start a new chat.
 
-   [Install BTO CV](codex://plugins/install/bto-cv?marketplace=bto-cv-marketplace)
+Once installed, start a new chat, select **BTO CV** from the plugin menu, attach your CV, and ask:
 
-4. Start a new chat, select the BTO CV plugin, attach a fictional test CV, and ask: **Convert this CV into BTO HTML format.**
+> Convert this CV into BTO HTML format using the latest template.
 
-The install link cannot register an unknown marketplace or grant access to this private repository. If the marketplace command or local plugin browser is unavailable, that client cannot use these steps. This repository is not a public-directory listing or a verified cross-account ChatGPT share link.
+**Only need the install screen?** After marketplace registration, use [Install BTO CV](codex://plugins/install/bto-cv?marketplace=bto-cv-marketplace), or open Plugins → BTO CV Marketplace → BTO CV. Some browsers do not open app links; use the plugin menu instead.
 
-## Send this to a colleague
+## Test it without personal data
 
-Send the repository link: https://github.com/KeyanFEILI/BTO-CV
+Use [the fictional sample CV](examples/sample-cv.txt). Check that all supplied facts are preserved, no qualifications are invented, and the response identifies the template revision. Open the HTML, edit the name, save a copy, reopen it, and check Print / Save PDF.
 
-Ask them to follow the installation steps above after accepting your GitHub invitation. They need to complete registration and installation once. A link alone cannot replace the private-repository access and marketplace registration steps.
-
-## Avoid duplicate installations
-
-Use either the plugin or the standalone bto-cv skill. Existing standalone users should confirm that the plugin works, then remove their old personal bto-cv skill using their supported skill-management workflow. Do not install a second renamed copy. The maintainer's existing standalone install has not been removed by publishing this marketplace.
+The owner can then push a small template change. Generate a new CV and check that it uses the new revision. A colleague's separate account still needs this pilot test.
 
 ## Updates
 
-The single editable template remains `skills/bto-cv/assets/BTO_CV_Template.html`. Edit, review, commit, and push it to main. The skill attempts to retrieve that file for every new CV; successful retrieval picks up the current template. If retrieval fails it asks before using the bundled snapshot. Existing CVs are unchanged.
+| Change | What happens |
+| --- | --- |
+| Owner edits and pushes the HTML template | The next generation retrieves it from GitHub, subject to working access. |
+| Owner updates plugin or skill instructions | Refresh the marketplace and update the installed plugin; use a new chat. |
+| A CV was already generated | That file remains unchanged. |
 
-Changes to plugin metadata or skill instructions require a plugin update. Increment `version` in `plugin.json` when releasing package changes, then refresh the marketplace:
+To request a package update, paste this into local Codex:
 
-```sh
-codex plugin marketplace upgrade bto-cv-marketplace
-```
+> Update bto-cv@bto-cv-marketplace from its registered GitHub source. Run `codex plugin marketplace upgrade bto-cv-marketplace`, inspect the installed version, and use the supported plugin update or reinstall flow if needed. Verify the resulting version without creating a second copy. Tell me when to start a new chat.
 
-Restart the desktop app and use its plugin update/reinstall flow as needed. Marketplace refresh is not a guarantee that an active chat has reloaded skill instructions. Test updates in a new chat.
+If template retrieval fails, the skill asks before using its bundled fallback. Refreshing a marketplace alone does not guarantee that an installed plugin or an active chat has reloaded its instructions.
 
-## Pilot test
+## Troubleshooting
 
-- Confirm installation under a colleague's separate account.
-- Generate a fictional CV and check that the current GitHub template was retrieved.
-- Push a small template change and generate another CV; check that it appears.
-- Check that unavailable repository access produces an explicit retrieval failure.
+| Problem | Next step |
+| --- | --- |
+| Repository unavailable or 404 | Accept the GitHub invitation and check the signed-in GitHub account. |
+| Codex/plugin commands unavailable | Use a supported local Codex environment; this is not a public ChatGPT directory listing. |
+| Plugin not visible after installation | Start a new chat; restart the desktop app if necessary. |
+| Two BTO CV skills appear | Keep the verified plugin and retire the old standalone installation. |
+| Changes disappear after closing HTML | Use Save HTML copy before closing; edits are not automatically stored. |
 
-Template retrieval, editing, saving, responsive layout, and print rendering have been tested on the maintainer's computer. A colleague-account installation still requires testing.
+## For the maintainer
 
-## Browser editing
+- Master template: `skills/bto-cv/assets/BTO_CV_Template.html`.
+- Workflow instructions: `skills/bto-cv/SKILL.md`.
+- Plugin version and presentation: `plugin.json`.
+- Marketplace catalog: `.agents/plugins/marketplace.json`.
 
-Choose Edit CV, replace the text, and use Save HTML copy before closing. For PDF, use Print / Save PDF with Letter paper and browser headers and footers disabled.
+Edit the master in this repository, review it, commit, and push. Increment the plugin version for package releases. Keep candidate files and generated CVs outside this repository. The installed template is a fallback snapshot, not a second master.
 
-Store only reusable plugin files here. Keep candidate CVs, generated candidate output, and credentials outside the repository.
+This private marketplace requires initial GitHub access and marketplace registration. A repository or install link cannot grant either automatically.
