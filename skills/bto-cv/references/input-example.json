@@ -1,0 +1,46 @@
+{
+  "initials": "A.E.",
+  "experience": [
+    {
+      "dates": "01/2025 - Present",
+      "role": "Product Owner",
+      "employer": "Example Company",
+      "bullets": [
+        "Manage product priorities and coordinate an engineering team.",
+        "Delivered an internal planning tool."
+      ]
+    },
+    {
+      "dates": "01/2023 - 12/2024",
+      "role": "Business Analyst",
+      "employer": "Example Consulting",
+      "bullets": [
+        "Gathered business requirements and documented acceptance criteria."
+      ]
+    }
+  ],
+  "education": [
+    "BSc Computer Science, Example University | 2022"
+  ],
+  "skills": [
+    {
+      "category": "Delivery methods",
+      "bullets": [
+        "Scrum; Kanban."
+      ]
+    },
+    {
+      "category": "Tools and technologies",
+      "bullets": [
+        "Jira; Confluence; SQL; HTML."
+      ]
+    }
+  ],
+  "certifications": [
+    "Product Fundamentals - Example Academy | 2024"
+  ],
+  "languages": [
+    "English (Fluent)",
+    "French (Intermediate)"
+  ]
+}

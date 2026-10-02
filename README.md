@@ -1,6 +1,8 @@
 # BTO CV
 
-Turn a supplied CV into BTO-branded HTML, with browser editing and print-to-PDF support.
+Give the plugin an original PDF or Word CV and receive an editable **BTO .docx**, with the original banner, Century Gothic typography, measured spacing and real square bullet lists.
+
+Version 2 uses native Word templates derived from the supplied M.M. and D.P. references. M.M. is the consistent default; D.P. is an optional layout. The original candidate files are not distributed.
 
 ## Start here
 
@@ -12,13 +14,13 @@ Copy this message into a local Codex chat:
 
 Once installed, start a new chat, select **BTO CV** from the plugin menu, attach your CV, and ask:
 
-> Convert this CV into BTO HTML format using the latest template.
+> Convert this original CV into an editable BTO Word document using the latest template.
 
-**Only need the install screen?** After marketplace registration, use [Install BTO CV](codex://plugins/install/bto-cv?marketplace=bto-cv-marketplace), or open Plugins → BTO CV Marketplace → BTO CV. Some browsers do not open app links; use the plugin menu instead.
+**Only need the install screen?** After marketplace registration, use [Install BTO CV](codex://plugins/install/bto-cv?marketplace=bto-cv-marketplace), or open Plugins â†’ BTO CV Marketplace â†’ BTO CV. Some browsers do not open app links; use the plugin menu instead.
 
 ## Test it without personal data
 
-Use [the fictional sample CV](examples/sample-cv.txt). Check that all supplied facts are preserved, no qualifications are invented, and the response identifies the template revision. Open the HTML, edit the name, save a copy, reopen it, and check Print / Save PDF.
+Use [the fictional sample CV](examples/sample-cv.txt). Check that all supplied facts are preserved, no qualifications are invented, and the response identifies the template revision. Open the DOCX in Word, edit the initials, and press Enter at the end of a bullet: Word should create another list item. Check the banner and page breaks in Print Layout.
 
 The owner can then push a small template change. Generate a new CV and check that it uses the new revision. A colleague's separate account still needs this pilot test.
 
@@ -26,7 +28,7 @@ The owner can then push a small template change. Generate a new CV and check tha
 
 | Change | What happens |
 | --- | --- |
-| Owner edits and pushes the HTML template | The next generation retrieves it from GitHub, subject to working access. |
+| Owner edits and pushes the Word master | The next generation retrieves it from GitHub, subject to working access. |
 | Owner updates plugin or skill instructions | Refresh the marketplace and update the installed plugin; use a new chat. |
 | A CV was already generated | That file remains unchanged. |
 
@@ -44,11 +46,11 @@ If template retrieval fails, the skill asks before using its bundled fallback. R
 | Codex/plugin commands unavailable | Use a supported local Codex environment; this is not a public ChatGPT directory listing. |
 | Plugin not visible after installation | Start a new chat; restart the desktop app if necessary. |
 | Two BTO CV skills appear | Keep the verified plugin and retire the old standalone installation. |
-| Changes disappear after closing HTML | Use Save HTML copy before closing; edits are not automatically stored. |
+| Output looks different on another computer | Check Century Gothic and Tw Cen MT font availability and use Microsoft Word Print Layout. |
 
 ## For the maintainer
 
-- Master template: `skills/bto-cv/assets/BTO_CV_Template.html`.
+- Master template: `skills/bto-cv/assets/BTO_CV_Template.docx`.
 - Workflow instructions: `skills/bto-cv/SKILL.md`.
 - Plugin version and presentation: `plugin.json`.
 - Marketplace catalog: `.agents/plugins/marketplace.json`.
@@ -56,3 +58,13 @@ If template retrieval fails, the skill asks before using its bundled fallback. R
 Edit the master in this repository, review it, commit, and push. Increment the plugin version for package releases. Keep candidate files and generated CVs outside this repository. The installed template is a fallback snapshot, not a second master.
 
 This private marketplace requires initial GitHub access and marketplace registration. A repository or install link cannot grant either automatically.
+
+## Exact formatting and conversion
+
+The generator clones native Word paragraph prototypes and preserves the embedded banner, numbering, styles and page settings. It does not convert HTML to Word. IT skills, education, certificates and languages use native bullets as well as job responsibilities. Body content remains editable. Different candidate lengths naturally change pagination; fonts and rendering software can also affect page breaks. The two supplied references contain small layout differences, documented in `skills/bto-cv/references/format.md`.
+
+The agent extracts candidate information into temporary JSON and runs the bundled Python 3 generator. Users only provide their original CV; they do not need to prepare JSON. Optional HTML is a secondary preview and cannot override the Word master.
+
+Developer check: `python -m unittest discover -s tests` verifies package preservation, native numbering, text escaping, optional sections and overwrite protection. The one-page fictional result and both three-page reference-content results were rendered and inspected with Microsoft Word. Keep these candidate-content QA files local.
+
+For layout updates, retain the placeholder tokens in the DOCX master. For code or rule changes, bump the plugin version and update the installed plugin.

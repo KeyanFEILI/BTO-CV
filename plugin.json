@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "bto-cv",
-  "version": "1.0.1",
-  "description": "Convert supplied CVs into BTO-branded HTML using the maintained company template.",
+  "version": "2.0.0",
+  "description": "Convert original CVs into editable BTO Word documents using reference-derived formatting and native bullet lists.",
   "author": {
     "name": "Keyan FEILI"
   },
@@ -11,14 +11,14 @@
     "com.openai": {
       "interface": {
         "displayName": "BTO CV",
-        "shortDescription": "Create BTO-branded CVs from supplied candidate information.",
+        "shortDescription": "Original CV in. Editable BTO Word CV out.",
         "category": "Productivity",
         "defaultPrompt": [
-          "Convert the attached CV into BTO HTML format using the latest template.",
-          "Create a fictional BTO CV to test the template and print layout."
+          "Convert the attached original CV into an editable BTO Word document.",
+          "Create a fictional BTO Word CV to test the formatting and native bullet lists."
         ],
         "brandColor": "#00665E",
-        "longDescription": "Convert supplied Word, PDF or text CVs into BTO-branded HTML. Retrieves the maintained template when GitHub access is available, preserves supplied facts, and supports editing and printing in a browser."
+        "longDescription": "Create an editable .docx using the BTO reference banner, Century Gothic fonts, measured spacing and native square bullet lists. Preserves supplied facts. Includes a deterministic Word generator and optional HTML preview."
       }
     }
   }
