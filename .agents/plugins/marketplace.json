@@ -1,0 +1,20 @@
+{
+  "name": "bto-cv-marketplace",
+  "interface": {
+    "displayName": "BTO CV Marketplace"
+  },
+  "plugins": [
+    {
+      "name": "bto-cv",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

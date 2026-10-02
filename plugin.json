@@ -1,0 +1,23 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "bto-cv",
+  "version": "1.0.0",
+  "description": "Convert supplied CVs into BTO-branded HTML using the maintained company template.",
+  "author": {
+    "name": "Keyan FEILI"
+  },
+  "repository": "https://github.com/KeyanFEILI/BTO-CV",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "BTO CV",
+        "shortDescription": "Create BTO-branded CVs from supplied candidate information.",
+        "category": "Productivity",
+        "defaultPrompt": [
+          "Convert the attached CV into BTO HTML format."
+        ],
+        "brandColor": "#00665E"
+      }
+    }
+  }
+}

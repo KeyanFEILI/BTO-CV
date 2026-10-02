@@ -1,31 +1,58 @@
-# BTO CV
+# BTO CV Marketplace
 
-Convert supplied PDF or Word CVs and career details into BTO-branded HTML. PDF export is optional when a renderer is available.
+An installable BTO CV plugin for supported local Codex desktop environments. It converts supplied CVs into self-contained BTO-branded HTML. This private repository marketplace is separate from the public ChatGPT plugin directory; ordinary ChatGPT desktop access alone does not guarantee support.
 
-## Install and use
+## Install on a colleague's account
 
-This is a local Codex skill, not a published ChatGPT plugin. Use a desktop environment with local skill installation. Ordinary ChatGPT desktop access alone is not sufficient proof of compatibility.
+1. The repository owner invites the colleague's GitHub account to this private repository. The colleague accepts and signs into GitHub using their normal local Git authentication.
+2. In a terminal with Codex CLI available, register this marketplace:
 
-1. Give the colleague read access to this private GitHub repository and complete their normal GitHub authentication.
-2. In their supported desktop environment, ask: `Install the bto-cv skill from https://github.com/KeyanFEILI/BTO-CV at path skills/bto-cv.`
-3. On the next turn, attach a candidate CV and ask: `Use $bto-cv to convert this CV into BTO HTML format.`
+   ```sh
+   codex plugin marketplace add https://github.com/KeyanFEILI/BTO-CV.git --ref main
+   ```
 
-If the skill is not listed, start a new chat. If the environment has no skill installer or authenticated repository retrieval, resolve those prerequisites before using this workflow. Never paste passwords or tokens into a chat.
+   Alternatively, ask a local Codex chat to run that command. No passwords or tokens should be pasted into a chat.
+3. Restart the desktop app. In Plugins, choose **BTO CV Marketplace**, then install **BTO CV**. This link can open installation after registration:
 
-## Maintain the template
+   [Install BTO CV](codex://plugins/install/bto-cv?marketplace=bto-cv-marketplace)
 
-The single editable master is `skills/bto-cv/assets/BTO_CV_Template.html` in this repository. Edit it here, review the result, commit, and push to the default branch using GitHub Desktop.
+4. Start a new chat, select the BTO CV plugin, attach a fictional test CV, and ask: **Convert this CV into BTO HTML format.**
 
-For each new CV, the skill attempts to retrieve that master from GitHub. Changes apply after a successful retrieval. If retrieval fails, it reports the problem and asks before using the bundled snapshot. This is not background auto-sync. Previously generated CVs do not change.
+The install link cannot register an unknown marketplace or grant access to this private repository. If the marketplace command or local plugin browser is unavailable, that client cannot use these steps. This repository is not a public-directory listing or a verified cross-account ChatGPT share link.
 
-The installed asset is an intentional fallback snapshot, not another master. Update installed skill instructions separately after changing `skills/bto-cv/SKILL.md`; request an update to the existing skill rather than creating a second copy. The installer may reject an already-existing destination.
+## Send this to a colleague
 
-## Edit a generated CV
+Send the repository link: https://github.com/KeyanFEILI/BTO-CV
 
-Open the HTML in a browser, choose Edit CV, and change the text. Save HTML copy downloads the current edits. Print / Save PDF opens the browser print dialog; use Letter paper with browser headers and footers disabled. Closing without saving loses edits.
+Ask them to follow the installation steps above after accepting your GitHub invitation. They need to complete registration and installation once. A link alone cannot replace the private-repository access and marketplace registration steps.
 
-## Verification and sharing
+## Avoid duplicate installations
 
-Authenticated installation and retrieval have been tested on the maintainer's computer, along with HTML editing, saving, responsive layout, and print rendering. A colleague's separate account still needs a pilot test: install, retrieve the current template, generate a fictional CV, and confirm that a later pushed template change appears on the next generation. Failed retrieval must be reported explicitly.
+Use either the plugin or the standalone bto-cv skill. Existing standalone users should confirm that the plugin works, then remove their old personal bto-cv skill using their supported skill-management workflow. Do not install a second renamed copy. The maintainer's existing standalone install has not been removed by publishing this marketplace.
 
-Keep candidate CVs, generated candidate output, and credentials outside this repository. Only the reusable skill, template, and maintenance documentation belong here.
+## Updates
+
+The single editable template remains `skills/bto-cv/assets/BTO_CV_Template.html`. Edit, review, commit, and push it to main. The skill attempts to retrieve that file for every new CV; successful retrieval picks up the current template. If retrieval fails it asks before using the bundled snapshot. Existing CVs are unchanged.
+
+Changes to plugin metadata or skill instructions require a plugin update. Increment `version` in `plugin.json` when releasing package changes, then refresh the marketplace:
+
+```sh
+codex plugin marketplace upgrade bto-cv-marketplace
+```
+
+Restart the desktop app and use its plugin update/reinstall flow as needed. Marketplace refresh is not a guarantee that an active chat has reloaded skill instructions. Test updates in a new chat.
+
+## Pilot test
+
+- Confirm installation under a colleague's separate account.
+- Generate a fictional CV and check that the current GitHub template was retrieved.
+- Push a small template change and generate another CV; check that it appears.
+- Check that unavailable repository access produces an explicit retrieval failure.
+
+Template retrieval, editing, saving, responsive layout, and print rendering have been tested on the maintainer's computer. A colleague-account installation still requires testing.
+
+## Browser editing
+
+Choose Edit CV, replace the text, and use Save HTML copy before closing. For PDF, use Print / Save PDF with Letter paper and browser headers and footers disabled.
+
+Store only reusable plugin files here. Keep candidate CVs, generated candidate output, and credentials outside the repository.
