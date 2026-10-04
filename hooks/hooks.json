@@ -1,0 +1,15 @@
+{
+  "description": "Check the private BTO CV marketplace at local session startup/resume, at most once daily.",
+  "hooks": {
+    "SessionStart": [{
+      "matcher": "^(startup|resume)$",
+      "hooks": [{
+        "type": "command",
+        "command": "python3 \"${PLUGIN_ROOT}/hooks/update.py\"",
+        "commandWindows": "python \"${PLUGIN_ROOT}/hooks/update.py\"",
+        "timeout": 120,
+        "statusMessage": "Checking BTO CV updates"
+      }]
+    }]
+  }
+}

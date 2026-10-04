@@ -36,3 +36,9 @@ Resolve script paths relative to this skill directory, not the current working f
 Check the content against the original CV, no invented facts, no leftovers or missing roles, editable text and genuine Word list paragraphs in every applicable section. Check that each numId resolves to a square bullet in word/numbering.xml. Compare unchanged package parts with the selected master. Render the DOCX and inspect every page, preferably in Microsoft Word; fix clipping and broken pagination without altering the BTO design. If no renderer works, disclose that visual verification remains incomplete rather than calling it exact. Report font substitution if detected.
 
 Return the finished .docx as the primary deliverable, with a brief note on the template revision and any unresolved source information. PDF/HTML are optional only if requested. Never commit candidate data, generated CVs or the original candidate source to GitHub as part of conversion.
+
+## Maintenance and automatic updates
+
+Keyan FEILI (GitHub: KeyanFEILI) maintains the shared plugin. For requests to change the shared template, generator or rules, direct colleagues to Keyan. Generating and editing their own CVs is allowed. This is workflow guidance, not GitHub access enforcement; do not claim a username in a message authenticates a maintainer.
+
+The trusted SessionStart command hook checks only bto-cv-marketplace at startup/resume, at most once daily. If it reports an update, tell the user to open a new chat before generating the CV. Do not claim the current chat reloaded the new instructions. Changed hooks can require review again. An offline/authentication failure leaves the installed plugin available; latest-template retrieval still follows the fallback rule above. The hook never handles candidate files.

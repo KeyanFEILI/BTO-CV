@@ -2,7 +2,7 @@
 
 Give the plugin an original PDF or Word CV and receive an editable **BTO .docx**, with the original banner, Century Gothic typography, measured spacing and real square bullet lists.
 
-Version 3 uses one native Word template derived exclusively from D.P. The original D.P. banner, square list markers, first-job indentation, later-job alignment and paragraph spacing are retained. There is no layout switch. The original candidate files are not distributed.
+Version 3.1 uses one native Word template derived exclusively from D.P. The original D.P. banner, square list markers, first-job indentation, later-job alignment and paragraph spacing are retained. There is no layout switch. The original candidate files are not distributed.
 
 ## Start here
 
@@ -29,7 +29,7 @@ The owner can then push a small template change. Generate a new CV and check tha
 | Change | What happens |
 | --- | --- |
 | Owner edits and pushes the Word master | The next generation retrieves it from GitHub, subject to working access. |
-| Owner updates plugin or skill instructions | Refresh the marketplace and update the installed plugin; use a new chat. |
+| Owner updates plugin or skill instructions | The trusted session hook checks daily at startup/resume and installs a changed version; start a new chat after an update. |
 | A CV was already generated | That file remains unchanged. |
 
 To request a package update, paste this into local Codex:
@@ -68,3 +68,15 @@ The agent extracts candidate information into temporary JSON and runs the bundle
 Developer check: `python -m unittest discover -s tests` verifies package preservation, native numbering, text escaping, optional sections and overwrite protection. The corrected fictional result and the D.P. reference-content replay are validated with Microsoft Word. Keep these candidate-content QA files local.
 
 For layout updates, retain the placeholder tokens in the DOCX master. For code or rule changes, bump the plugin version and update the installed plugin.
+
+## Automatic updater setup (3.1.0)
+
+Use local Codex desktop sessions. Python 3 must be available as `python` on Windows (`python3` on macOS/Linux); Git and a plugin-capable Codex CLI must be accessible to the hook. An explicit `BTO_CODEX_BIN` path is supported when Codex is not on PATH. Configure GitHub credentials for non-interactive Git access. GitHub CLI is optional if another credential helper already works.
+
+Review and trust the BTO hook using `/hooks` in Codex CLI (or the desktop hook-review control if available). Installation alone does not trust it. No trust bypass is required. The hook checks at startup/resume, not simply when an app window opens. It is silent when current, checks at most once per 24 hours, and retries a failed check at a later session start after one hour. It updates only this marketplace/plugin, respects disabled installations, uses a lock against overlapping checks, and stores only check time/version/status in PLUGIN_DATA.
+
+For an immediate diagnostic, run the installed `hooks/update.py --force --check` with Python. A result of `current` or `updated` confirms success; `failed` needs attention. Reopen a local session to verify the trusted hook actually fires. A changed hook definition can require renewed trust. New chats are required after package updates; old chats do not hot-reload instructions.
+
+Maintainer: Keyan FEILI. Ask Keyan for changes to the shared plugin. You may edit your generated CVs. Private personal-repository collaborators have write access; this convention is not an access-control mechanism.
+
+See `docs/BTO_CV_Team_Setup.pdf` and `docs/BTO_CV_Owner_Checklist.pdf`. Owner verification includes unit tests and a live GitHub update check; a separate-account pilot and each colleague's hook-trust step remain required.
