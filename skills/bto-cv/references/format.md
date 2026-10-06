@@ -1,20 +1,20 @@
 # R.R. / A.F.R. formatting contract
 
-The user-supplied BTO_CV_RR.docx and BTO_CV_AFR.docx share the authoritative layout. The anonymized packaged master uses R.R. paragraph prototypes, shared by A.F.R., with keepLines added to lists and keepNext to skill categories to prevent split bullets and orphan labels. Reference candidate content must never be copied into generated CVs.
+The R.R./A.F.R. design is retained with user-approved corrected margins and gaps. Written requirements override the corrected example where they differ (its bottom margin is 1.5 cm; the required bottom margin is 1.25 cm). The anonymized packaged master uses R.R. paragraph prototypes, shared by A.F.R., with keepLines added to lists and keepNext to skill categories to prevent split bullets and orphan labels. Reference candidate content must never be copied into generated CVs.
 
-- A4 portrait: 11906 x 16838 twips; top/left 1440, right 1274, bottom 1276; header/footer 708. One section, no page numbers or repeating banner.
-- Preserve the shared inline banner image (SHA-256 aaa03ec16e78150da31f576946e12651c07167defe1b03fc382d9d9146b12cfc), centered drawing at 6172200 x 789232 EMU, hanging indent 284 and 180 twips after.
-- Initials: centered, bold Century Gothic 16 pt; 120 twips after, single line spacing.
+- A4 portrait: 11906 x 16838 twips; left/right 1134, top 850, bottom 709 (2 cm, 1.5 cm, 1.25 cm respectively, rounded to Word twips); header/footer 708. One section, no page numbers or repeating banner.
+- Preserve the shared inline banner image (SHA-256 aaa03ec16e78150da31f576946e12651c07167defe1b03fc382d9d9146b12cfc), centered drawing at 6172200 x 789232 EMU, no paragraph indentation and zero space after as in the corrected reference.
+- Initials: centered, bold Century Gothic 16 pt; 120 twips after, single line spacing. Follow with the corrected reference's blank 11 pt title gap (single line, 120 twips after, keepNext).
 - Body: Century Gothic 11 pt. Dates and roles bold, employer regular. Main responsibilities: underlined, regular weight as in both references. Job labels have zero after and single line spacing. All jobs are unindented.
-- Headings: Century Gothic 13 pt bold, #00665F, uppercase, unindented; before 110, after 80 twips, single line spacing, keepNext. Order: WORK EXPERIENCE, EDUCATION, IT SKILLS, CERTIFICATIONS AND TRAINING, LANGUAGES. Empty sections are omitted.
+- Headings: Century Gothic 13 pt bold, #00665F, uppercase, unindented; before 0, after 80 twips, single line spacing, keepNext. Order: WORK EXPERIENCE, EDUCATION, IT SKILLS, CERTIFICATIONS AND TRAINING, LANGUAGES. Empty sections are omitted.
 - Native square Word lists: numId 9, level 0, abstractNum 10; U+F0A7 in Wingdings. Numbering indentation left 360, hanging 360 twips. ListParagraph inherits Normal/Century Gothic. Preserve its contextualSpacing and reference paragraph spacing: after 10 twips, line 228, auto. All applicable sections use genuine Word lists, never typed markers.
-- Later jobs receive 100 twips before their first emitted label, even if dates are missing. Skill categories receive 60 before, zero after, single line spacing and keepNext.
-- Use paragraph spacing rather than D.P.'s blank paragraphs or trailing first-job line break. Candidate-specific empty paragraphs and manual pagination are not reusable layout rules. Do not force a page count, shrink fonts or add unconditional page breaks. Word paginates according to content, keepNext and keepLines.
+- Insert one empty 11 pt Century Gothic body paragraph between experience entries, even if dates or bullets are missing. Insert two such paragraphs between populated major sections; omit gaps for absent sections. Gap paragraphs have single line spacing, zero before/after, keepNext and no numbering. Skill categories receive 60 before, zero after, single line spacing and keepNext.
+- Use the explicit body-line gaps above without extra job/heading spacing or trailing first-job line breaks. Candidate-specific empty paragraphs and manual pagination are not reusable layout rules. Do not force a page count, shrink fonts or add unconditional page breaks. Word paginates according to content, keepNext and keepLines.
 - Equivalent rendering requires Century Gothic and Wingdings. Report font substitution. Longer content naturally changes wrapping and pagination.
 
 ## Master and compatibility
 
-The only master is assets/BTO_CV_Template.docx. Version 3.2 requires the layout_rr_afr_v1 marker and slots initials, dates, role, employer, responsibilities, experience_bullet, education_bullet, skill_category, skill_bullet, certification_bullet and language_bullet. The marker is never emitted. Fixed headings identify section prototypes. D.P. masters fail validation rather than silently mixing layouts.
+The only master is assets/BTO_CV_Template.docx. Version 3.2.2 requires the layout_rr_afr_v2 marker and slots gap, initial_gap, initials, dates, role, employer, responsibilities, experience_bullet, education_bullet, skill_category, skill_bullet, certification_bullet and language_bullet. The marker is never emitted. Fixed headings identify section prototypes. D.P. masters fail validation rather than silently mixing layouts.
 
 The generator changes only word/document.xml. Styles, numbering, theme, relationships, metadata and image bytes remain unchanged from the selected master. Banner and section properties are cloned unchanged. The master retains the previous anonymized package metadata; only layout paragraphs, styles, numbering and theme were taken from the reference. Never commit candidate originals, normalized candidate data or generated candidate CVs.
 

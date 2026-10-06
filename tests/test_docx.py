@@ -8,6 +8,32 @@ spec=importlib.util.spec_from_file_location('builder',SKILL/'scripts/build_docx.
 builder=importlib.util.module_from_spec(spec);spec.loader.exec_module(builder)
 W=builder.W
 class NativeWordTests(unittest.TestCase):
+ def test_exact_blank_lines_for_jobs_and_optional_sections(self):
+  for mask in range(32):
+   data={'initials':'T.E.'}
+   sections=[('experience',[{'dates':'2025','role':'First','bullets':['A']},{'employer':'Second','bullets':[]},{'bullets':['B']}]),('education',['Degree']),('skills',[{'category':'Tools','bullets':['SQL']}]),('certifications',['Certificate']),('languages',['English'])]
+   expected=['T.E.',''];populated=False
+   for i,(key,value) in enumerate(sections):
+    if not mask & (1<<i):continue
+    data[key]=value
+    if populated:expected+=['','']
+    expected+=[builder.HEADINGS[i]];populated=True
+    expected+=([ '2025','First','Main responsibilities:','A','','Second','','Main responsibilities:','B'] if key=='experience' else ['Tools','SQL'] if key=='skills' else value)
+   if not populated:continue
+   with self.subTest(mask=mask),tempfile.TemporaryDirectory() as tmp:
+    output=Path(tmp)/'cv.docx';builder.build(data,output)
+    with zipfile.ZipFile(output) as z:doc=minidom.parseString(z.read('word/document.xml'))
+    paras=builder.children(doc.getElementsByTagNameNS(W,'body')[0],'p')[1:]
+    self.assertEqual([builder.text(p) for p in paras],expected)
+    for p in paras:
+     if builder.text(p):continue
+     self.assertFalse(p.getElementsByTagNameNS(W,'numPr'))
+     self.assertFalse(builder.children(p,'r'))
+     self.assertTrue(p.getElementsByTagNameNS(W,'keepNext'))
+     spacing=p.getElementsByTagNameNS(W,'spacing')[0]
+     self.assertEqual([spacing.getAttribute('w:'+a) for a in ['before','after','line']],['0','120' if p is paras[1] else '0','240'])
+     self.assertEqual(p.getElementsByTagNameNS(W,'sz')[0].getAttribute('w:val'),'22')
+
  def test_installed_pair_generates_offline_from_any_working_directory(self):
   data=json.loads((SKILL/'references/input-example.json').read_text())
   with tempfile.TemporaryDirectory() as tmp:
@@ -29,7 +55,7 @@ class NativeWordTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as tmp:
    template=Path(tmp)/'external.docx';output=Path(tmp)/'cv.docx'
    with zipfile.ZipFile(SKILL/'assets/BTO_CV_Template.docx') as src,zipfile.ZipFile(template,'w') as dst:
-    for name in src.namelist():dst.writestr(name,src.read(name).replace(b'{{layout_rr_afr_v1}}',b'{{other_release}}') if name=='word/document.xml' else src.read(name))
+    for name in src.namelist():dst.writestr(name,src.read(name).replace(b'{{layout_rr_afr_v2}}',b'{{other_release}}') if name=='word/document.xml' else src.read(name))
    with self.assertRaisesRegex(ValueError,'omit --template'):
     builder.build(data,output,template)
    self.assertFalse(output.exists())
@@ -45,7 +71,7 @@ class NativeWordTests(unittest.TestCase):
    extent=doc.getElementsByTagNameNS('http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing','extent')[0]
    self.assertEqual((extent.getAttribute('cx'),extent.getAttribute('cy')),('6172200','789232'))
    margin=doc.getElementsByTagNameNS(W,'pgMar')[0]
-   self.assertEqual([margin.getAttribute('w:'+k) for k in ['top','right','bottom','left']],['1440','1274','1276','1440'])
+   self.assertEqual([margin.getAttribute('w:'+k) for k in ['top','right','bottom','left']],['850','1134','709','1134'])
    styles=minidom.parseString(z.read('word/styles.xml'))
    normal=next(n for n in styles.getElementsByTagNameNS(W,'style') if n.getAttribute('w:styleId')=='Normal')
    self.assertEqual(normal.getElementsByTagNameNS(W,'rFonts')[0].getAttribute('w:ascii'),'Century Gothic')
@@ -69,7 +95,7 @@ class NativeWordTests(unittest.TestCase):
    for label in ['Two','Main responsibilities:']:
     if label=='Two':p=next(p for p in paras if builder.text(p)==label)
     else:p=[p for p in paras if builder.text(p)==label][-1]
-    self.assertEqual(p.getElementsByTagNameNS(W,'spacing')[0].getAttribute('w:before'),'100')
+    self.assertEqual(builder.text(paras[list(paras).index(p)-1]),'')
    self.assertFalse(doc.getElementsByTagNameNS(W,'pageBreakBefore'))
    self.assertFalse(doc.getElementsByTagNameNS(W,'br'))
 
@@ -155,11 +181,11 @@ class NativeWordTests(unittest.TestCase):
    for key in ['2025','First role','One','2024','Second role','Two','WORK EXPERIENCE','LANGUAGES','A.E.']:
     self.assertFalse(bytext[key].getElementsByTagNameNS(W,'ind'),key)
    self.assertFalse(bytext['Last'].getElementsByTagNameNS(W,'br'))
-   self.assertEqual(bytext['2024'].getElementsByTagNameNS(W,'spacing')[0].getAttribute('w:before'),'100')
+   self.assertEqual(builder.text(paras[list(paras).index(bytext['2024'])-1]),'')
    idx=list(paras).index(bytext['WORK EXPERIENCE'])
    self.assertEqual(builder.text(paras[idx+1]),'2025')
    spacing=bytext['WORK EXPERIENCE'].getElementsByTagNameNS(W,'spacing')[0]
-   self.assertEqual(spacing.getAttribute('w:before'),'110');self.assertEqual(spacing.getAttribute('w:after'),'80')
+   self.assertEqual(spacing.getAttribute('w:before'),'0');self.assertEqual(spacing.getAttribute('w:after'),'80')
    section=doc.getElementsByTagNameNS(W,'pgSz')[0]
    self.assertEqual(section.getAttribute('w:w'),'11906');self.assertEqual(section.getAttribute('w:h'),'16838')
    for p in paras:
@@ -170,7 +196,7 @@ class NativeWordTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as tmp:
    template=Path(tmp)/'legacy.docx'
    with zipfile.ZipFile(SKILL/'assets/BTO_CV_Template.docx') as src,zipfile.ZipFile(template,'w') as dst:
-    for name in src.namelist():dst.writestr(name,src.read(name).replace(b'{{layout_rr_afr_v1}}',b'{{legacy_layout}}') if name=='word/document.xml' else src.read(name))
+    for name in src.namelist():dst.writestr(name,src.read(name).replace(b'{{layout_rr_afr_v2}}',b'{{legacy_layout}}') if name=='word/document.xml' else src.read(name))
    with self.assertRaisesRegex(ValueError,'Template slot missing'):
     builder.build({'initials':'A.E.','languages':['English']},Path(tmp)/'cv.docx',template)
  def test_missing_sections_and_no_overwrite(self):

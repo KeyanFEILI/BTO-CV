@@ -95,7 +95,7 @@ def build(data, output, template=None):
     body=doc.getElementsByTagNameNS(W,'body')[0]
     paras=children(body,'p');sect=children(body,'sectPr')[0].cloneNode(True)
     prototypes={text(p):p for p in paras}
-    required=['layout_rr_afr_v1','initials','dates','role','employer','responsibilities','experience_bullet','education_bullet','skill_category','skill_bullet','certification_bullet','language_bullet']
+    required=['layout_rr_afr_v2','gap','initial_gap','initials','dates','role','employer','responsibilities','experience_bullet','education_bullet','skill_category','skill_bullet','certification_bullet','language_bullet']
     for slot in required:
         if '{{'+slot+'}}' not in prototypes:
             raise ValueError('Template slot missing: '+slot+'. Template and generator are incompatible; use the master bundled with this installed generator (omit --template).')
@@ -106,11 +106,8 @@ def build(data, output, template=None):
     if not banner.getElementsByTagNameNS(W,'drawing'): raise ValueError('Template banner missing')
     for node in list(body.childNodes): body.removeChild(node)
     body.appendChild(banner)
-    def emit(key,value=None,job_gap=False):
+    def emit(key,value=None):
         p=prototypes[key].cloneNode(True)
-        if job_gap:
-            spacing=children(children(p,'pPr')[0],'spacing')[0]
-            spacing.setAttributeNS(W,'w:before','100')
         if value is not None:
             runs=children(p,'r');rp=children(runs[0],'rPr') if runs else []
             rp=rp[0].cloneNode(True) if rp else None
@@ -127,19 +124,24 @@ def build(data, output, template=None):
                 p.appendChild(r)
                 for tail in tails:p.appendChild(tail)
         body.appendChild(p)
-    def slot(name,value,job_gap=False):emit('{{'+name+'}}',value,job_gap)
+    def slot(name,value):emit('{{'+name+'}}',value)
+    def gap(count):
+        for _ in range(count):slot('gap','')
     slot('initials',data['initials'])
+    slot('initial_gap','')
+    previous=None
     def heading(name):
-        emit(name)
+        nonlocal previous
+        if previous:gap(2)
+        emit(name);previous=name
     if data['experience']:
         heading(HEADINGS[0])
         for i,job in enumerate(data['experience']):
-            job_gap=i>0
+            if i:gap(1)
             for key in ['dates','role','employer']:
-                if job[key]:
-                    slot(key,job[key],job_gap);job_gap=False
+                if job[key]:slot(key,job[key])
             if job['bullets']:
-                slot('responsibilities','Main responsibilities:',job_gap)
+                slot('responsibilities','Main responsibilities:')
                 for b in job['bullets']:slot('experience_bullet',b)
     if data['education']:
         heading(HEADINGS[1])
