@@ -8,6 +8,21 @@ spec=importlib.util.spec_from_file_location('builder',SKILL/'scripts/build_docx.
 builder=importlib.util.module_from_spec(spec);spec.loader.exec_module(builder)
 W=builder.W
 class NativeWordTests(unittest.TestCase):
+ def test_language_display_mapping_and_retention(self):
+  for source,expected in [('Native','Native'),('mother tongue','Native'),('Fluent','Fluent'),('C1','Fluent'),('C2','Fluent'),('B2','Full Professional'),('Basic','Professional'),('A1','Professional'),('A2','Professional'),('B1','Professional')]:
+   for entry in ['French - '+source,'French ('+source+')','French: '+source.lower()]:
+    with self.subTest(entry=entry):self.assertEqual(builder.language_label(entry),'French ('+expected+')')
+  data={'initials':'T.E.','languages':['French (Native)','English - C2','Spanish - A1','German - B1','Italian - B2','Japanese','Dutch - Intermediate','Portuguese - C2 (Business certified)','French - B1 (DELF certified)']}
+  expected=['French (Native)','English (Fluent)','Spanish (Professional)','German (Professional)','Italian (Full Professional)','Japanese','Dutch - Intermediate','Portuguese (Fluent) (Business certified)','French (Professional) (DELF certified)']
+  self.assertEqual(builder.normalize(data)['languages'],expected)
+  self.assertEqual(builder.language_label('French (CEFR B1)'),'French (Professional)')
+  self.assertEqual(builder.language_label('English (Fluent / C2)'),'English (Fluent)')
+  self.assertEqual(builder.normalize(dict(data,languages=expected))['languages'],expected)
+  with tempfile.TemporaryDirectory() as tmp:
+   output=Path(tmp)/'cv.docx';builder.build(data,output)
+   with zipfile.ZipFile(output) as z:doc=minidom.parseString(z.read('word/document.xml'))
+   paras=doc.getElementsByTagNameNS(W,'p')
+   self.assertEqual([builder.text(p) for p in paras if p.getElementsByTagNameNS(W,'numPr')],expected)
  def test_exact_blank_lines_for_jobs_and_optional_sections(self):
   for mask in range(32):
    data={'initials':'T.E.'}
