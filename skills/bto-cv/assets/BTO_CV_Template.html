@@ -5,37 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BTO CV Template</title>
 <style>
-/* Secondary D.P. browser approximation; the native DOCX is the authoritative deliverable. Native Word output uses the DOCX master and build_docx.py. */
-:root { --accent: #00665e; --font: "Century Gothic", "Trebuchet MS", Arial, sans-serif; }
+/* Secondary R.R./A.F.R. browser approximation; the native DOCX is the authoritative deliverable. Native Word output uses the DOCX master and build_docx.py. */
+:root { --accent: #00665f; --font: "Century Gothic", "Trebuchet MS", Arial, sans-serif; }
 * { box-sizing: border-box; }
 body { margin: 0; background: #ecefee; color: #000; overflow-wrap: anywhere; font: 11pt/1.24 var(--font); }
-.toolbar { max-width: 8.5in; margin: 20px auto 12px; padding: 0 16px; font: 14px/1.5 Arial, sans-serif; color: #34433f; }
+.toolbar { max-width: 210mm; margin: 20px auto 12px; padding: 0 16px; font: 14px/1.5 Arial, sans-serif; color: #34433f; }
 .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
-button { border: 1px solid #00665e; background: white; color: #00665e; padding: 9px 14px; border-radius: 5px; font: inherit; cursor: pointer; }
-button:first-child { background: #00665e; color: white; }
+button { border: 1px solid #00665f; background: white; color: #00665f; padding: 9px 14px; border-radius: 5px; font: inherit; cursor: pointer; }
+button:first-child { background: #00665f; color: white; }
 button:focus-visible { outline: 3px solid #b12b5a; outline-offset: 3px; }
 .toolbar p { margin: 5px 0; }
-.page { width: 8.5in; min-height: 11in; margin: 0 auto 32px; padding: .45in .55in; background: white; box-shadow: 0 3px 20px #00000012; }
-.brand { display: block; width: 6.7in; max-width: 100%; height: auto; margin: 0 auto 10pt; }
-h1 { font-size: 16pt; line-height: 1.2; text-align: center; margin: 0 0 13.64pt; }
-h2 { color: var(--accent); font-size: 13pt; line-height: 1.25; margin: 0; text-transform: uppercase; break-after: avoid; }
+.page { width: 210mm; min-height: 297mm; margin: 0 auto 32px; padding: 1in .885in .886in 1in; background: white; box-shadow: 0 3px 20px #00000012; }
+.brand { display: block; width: 6.75in; max-width: 100%; height: auto; margin: 0 auto 9pt; }
+h1 { font-size: 16pt; line-height: 1.2; text-align: center; margin: 0 0 6pt; }
+h2 { color: var(--accent); font-size: 13pt; line-height: 1; margin: 5.5pt 0 4pt; text-transform: uppercase; break-after: avoid; }
 h3, p { font-size: inherit; margin: 0; }
-h3, .dates, .responsibilities { font-weight: bold; }
+h3, .dates { font-weight: bold; }
 .dates, h3, .employer, .responsibilities { break-after: avoid; }
 .responsibilities { text-decoration: underline; margin-top: 0; }
-.entry { margin-bottom: 13.64pt; }
-ul { padding-left: 9pt; margin: 0; list-style-type: "▪"; }
-li::marker { font-family: "Tw Cen MT"; }
-li { padding-left: 19.35pt; margin-bottom: 0; break-inside: avoid; }
+.entry { margin-bottom: 0; margin-top: 5pt; }
+ul { padding-left: 18pt; margin: 0; list-style-type: "▪"; }
+li::marker { font-family: sans-serif; }
+li { padding-left: 0; margin-bottom: .5pt; line-height: .95; break-inside: avoid; }
 .skill { margin-bottom: 0; }
-section + section { margin-top: 27.28pt; }
-#experience-heading { margin-bottom: 16.12pt; }
-.entry:first-of-type > h3, .entry:first-of-type > .dates, .entry:first-of-type > .employer, .entry:first-of-type > .responsibilities { margin-left: 21.3pt; text-indent: -14.2pt; }
+section + section { margin-top: 0; }
+#experience-heading { margin-bottom: 4pt; }
+.entry:first-of-type { margin-top: 0; }
 p { orphans: 3; widows: 3; }
 [contenteditable="true"] { outline: 2px dashed #8cbbb5; outline-offset: 6px; }
 [contenteditable="true"]:focus { outline-color: var(--accent); }
 @media (max-width: 850px) { .page { width: 100%; min-height: auto; padding: 30px 24px; } .toolbar { margin-top: 12px; } }
-@page { size: letter; margin: .45in .55in; }
+@page { size: A4; margin: 1in .885in .886in 1in; }
 @media print {
  body { background: white; }
  .toolbar { display: none !important; }
@@ -52,9 +52,9 @@ p { orphans: 3; widows: 3; }
   <button id="save" type="button">Save HTML copy</button>
   <button id="print" type="button">Print / Save PDF</button>
  </div>
- <p>This browser preview approximates D.P. Use the plugin to receive the authoritative editable Word document.</p>
+ <p>This browser preview approximates R.R./A.F.R. Use the plugin to receive the authoritative editable Word document.</p>
  <p>Choose Edit CV and replace the bracketed placeholders. Save an HTML copy to keep your changes.</p>
- <p>To add entries, duplicate the marked blocks in the HTML source. For PDF, select Letter paper and disable browser headers and footers.</p>
+ <p>To add entries, duplicate the marked blocks in the HTML source. For PDF, select A4 paper and disable browser headers and footers.</p>
  <p id="status" role="status" aria-live="polite"></p>
 </aside>
 <main class="page">
