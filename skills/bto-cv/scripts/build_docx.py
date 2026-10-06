@@ -20,13 +20,44 @@ def children(node, local):
 def string(value, label):
     if not isinstance(value, str) or not value.strip():
         raise ValueError(label + ' must be a non-empty string')
-    if re.search(r'[\x00-\x08\x0b\x0c\x0e-\x1f]', value):
+    if re.search(r'[\x00-\x08\x0b\x0c\x0e-\x1f\ud800-\udfff\ufffe\uffff]', value):
         raise ValueError(label + ' contains invalid XML control characters')
     return value.strip()
 
 def strings(value, label):
     if not isinstance(value, list): raise ValueError(label + ' must be a list')
-    return [string(v, label) for v in value]
+    result = [string(v, label) for v in value]
+    for v in result:
+        if re.match(r'^(?:[\u2022\u25aa\u25a0\u25cf\u25ab\uf0a7]|[-*]\s)', v):
+            raise ValueError(label + ' must contain content only, without a typed bullet prefix')
+    return result
+
+def validate_lists(prototypes, parts):
+    """Fail before writing if any list slot has lost its native square numbering."""
+    numbering=minidom.parseString(parts['word/numbering.xml'])
+    nums={n.getAttributeNS(W,'numId'):n for n in children(numbering.documentElement,'num')}
+    abstracts={n.getAttributeNS(W,'abstractNumId'):n for n in children(numbering.documentElement,'abstractNum')}
+    for slot in ['experience_bullet','education_bullet','skill_bullet','certification_bullet','language_bullet']:
+        try:
+            p=prototypes['{{'+slot+'}}']
+            numpr=children(children(p,'pPr')[0],'numPr')[0]
+            identifier=children(numpr,'numId')[0].getAttributeNS(W,'val')
+            level=children(numpr,'ilvl')[0].getAttributeNS(W,'val')
+            num=nums[identifier]
+            abstract=abstracts[children(num,'abstractNumId')[0].getAttributeNS(W,'val')]
+            # Overrides can replace the inherited glyph or turn the list into numbers.
+            overrides=[n for n in children(num,'lvlOverride') if n.getAttributeNS(W,'ilvl')==level]
+            levels=children(overrides[0],'lvl') if overrides else []
+            if not levels:levels=[n for n in children(abstract,'lvl') if n.getAttributeNS(W,'ilvl')==level]
+            lvl=levels[0]
+            fonts=children(children(lvl,'rPr')[0],'rFonts')[0]
+            valid=(children(lvl,'numFmt')[0].getAttributeNS(W,'val')=='bullet' and
+                   children(lvl,'lvlText')[0].getAttributeNS(W,'val')=='\uf0a7' and
+                   fonts.getAttributeNS(W,'ascii')=='Wingdings' and
+                   fonts.getAttributeNS(W,'hAnsi')=='Wingdings')
+            if not valid:raise ValueError()
+        except (IndexError,KeyError,ValueError):
+            raise ValueError('Template native square list invalid: '+slot) from None
 
 def normalize(data):
     if not isinstance(data, dict): raise ValueError('Candidate data must be an object')
@@ -64,17 +95,21 @@ def build(data, output, template=None):
     body=doc.getElementsByTagNameNS(W,'body')[0]
     paras=children(body,'p');sect=children(body,'sectPr')[0].cloneNode(True)
     prototypes={text(p):p for p in paras}
-    required=['heading_gap','list_gap','first_dates','first_role','first_employer','first_responsibilities','first_last_bullet','initials','gap','dates','role','employer','responsibilities','experience_bullet','education_bullet','skill_category','skill_bullet','certification_bullet','language_bullet']
+    required=['layout_rr_afr_v1','initials','dates','role','employer','responsibilities','experience_bullet','education_bullet','skill_category','skill_bullet','certification_bullet','language_bullet']
     for slot in required:
         if '{{'+slot+'}}' not in prototypes: raise ValueError('Template slot missing: '+slot)
     for heading in HEADINGS:
         if heading not in prototypes: raise ValueError('Template heading missing: '+heading)
+    validate_lists(prototypes,parts)
     banner=paras[0].cloneNode(True)
     if not banner.getElementsByTagNameNS(W,'drawing'): raise ValueError('Template banner missing')
     for node in list(body.childNodes): body.removeChild(node)
     body.appendChild(banner)
-    def emit(key,value=None):
+    def emit(key,value=None,job_gap=False):
         p=prototypes[key].cloneNode(True)
+        if job_gap:
+            spacing=children(children(p,'pPr')[0],'spacing')[0]
+            spacing.setAttributeNS(W,'w:before','100')
         if value is not None:
             runs=children(p,'r');rp=children(runs[0],'rPr') if runs else []
             rp=rp[0].cloneNode(True) if rp else None
@@ -91,29 +126,20 @@ def build(data, output, template=None):
                 p.appendChild(r)
                 for tail in tails:p.appendChild(tail)
         body.appendChild(p)
-    def slot(name,value):emit('{{'+name+'}}',value)
-    def gap(count=1):
-        for _ in range(count):slot('gap','')
-    slot('initials',data['initials']);gap()
-    previous=None
+    def slot(name,value,job_gap=False):emit('{{'+name+'}}',value,job_gap)
+    slot('initials',data['initials'])
     def heading(name):
-        nonlocal previous
-        if previous:
-            if previous in [HEADINGS[0],HEADINGS[3]]:slot('list_gap','');gap()
-            else:gap(2)
-        emit(name);previous=name
+        emit(name)
     if data['experience']:
-        heading(HEADINGS[0]);slot('heading_gap','')
+        heading(HEADINGS[0])
         for i,job in enumerate(data['experience']):
-            if i and (i!=1 or not data['experience'][0]['bullets']):gap()
-            prefix='first_' if i==0 else ''
+            job_gap=i>0
             for key in ['dates','role','employer']:
-                if job[key]:slot(prefix+key,job[key])
+                if job[key]:
+                    slot(key,job[key],job_gap);job_gap=False
             if job['bullets']:
-                slot(prefix+'responsibilities','Main responsibilities:')
-                for j,b in enumerate(job['bullets']):
-                    key='first_last_bullet' if i==0 and j==len(job['bullets'])-1 and len(data['experience'])>1 else 'experience_bullet'
-                    slot(key,b)
+                slot('responsibilities','Main responsibilities:',job_gap)
+                for b in job['bullets']:slot('experience_bullet',b)
     if data['education']:
         heading(HEADINGS[1])
         for b in data['education']:slot('education_bullet',b)
@@ -126,7 +152,6 @@ def build(data, output, template=None):
         if data[key]:
             heading(title)
             for b in data[key]:slot(role,b)
-    if previous==HEADINGS[4]:slot('list_gap','')
     body.appendChild(sect)
     parts['word/document.xml']=doc.toxml(encoding='UTF-8')
     output.parent.mkdir(parents=True,exist_ok=True)

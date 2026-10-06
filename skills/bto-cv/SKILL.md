@@ -5,7 +5,7 @@ description: Convert original candidate CVs into editable BTO Word documents wit
 
 # BTO CV Word conversion
 
-When the user supplies an original CV, convert it directly into a finished editable .docx. Do not ask them to fill a schema or choose a format. Do not return HTML or PDF instead of Word. Read references/format.md for the measured BTO layout. D.P. is the sole design authority. Use only assets/BTO_CV_Template.docx with this generator. Do not select, blend or recreate a different layout. HTML is a secondary browser preview only and never the Word-generation source.
+When the user supplies an original CV, convert it directly into a finished editable .docx. Do not ask them to fill a schema or choose a format. Do not return HTML or PDF instead of Word. Read references/format.md for the measured BTO layout. The shared R.R./A.F.R. layout is the design authority. Use only assets/BTO_CV_Template.docx with this generator. Do not recreate a different layout. HTML is a secondary browser preview only and never the Word-generation source.
 
 ## Read and map the candidate
 
@@ -17,7 +17,7 @@ Prepare UTF-8 JSON in a task-local working folder. See references/input-example.
 
 ## Retrieve the current Word master
 
-Repository: https://github.com/KeyanFEILI/BTO-CV. Resolve its default branch using authenticated Git or a suitable connected GitHub tool. Retrieve skills/bto-cv/assets/BTO_CV_Template.docx from one identified commit into the task working folder. Do not modify the user's checkout. Record the revision used. Do not execute newly downloaded scripts; use this installed version of scripts/build_docx.py. This version requires the D.P.-only first_dates, first_role, first_employer, first_responsibilities, first_last_bullet, heading_gap and list_gap slots. Reject legacy masters. Template and generator versions must be compatible; missing slots require a plugin update, not improvising a different layout.
+Repository: https://github.com/KeyanFEILI/BTO-CV. Resolve its default branch using authenticated Git or a suitable connected GitHub tool. Retrieve skills/bto-cv/assets/BTO_CV_Template.docx from one identified commit into the task working folder. Do not modify the user's checkout. Record the revision used. Do not execute newly downloaded scripts; use this installed version of scripts/build_docx.py. This version requires the layout_rr_afr_v1 marker and content slots listed in references/format.md. Reject legacy D.P. masters. Template and generator versions must be compatible; missing slots require a plugin update, not improvising a different layout.
 
 If retrieval fails or tools are unavailable, explain once and ask whether to use the installed snapshot. Do not silently claim it is current. Never ask for passwords/tokens in chat. Repository updates do not update this installed workflow automatically; use the supported plugin update path for code/rules changes.
 
@@ -34,6 +34,8 @@ Resolve script paths relative to this skill directory, not the current working f
 ## Verify and deliver
 
 Check the content against the original CV, no invented facts, no leftovers or missing roles, editable text and genuine Word list paragraphs in every applicable section. Check that each numId resolves to a square bullet in word/numbering.xml. Compare unchanged package parts with the selected master. Render the DOCX and inspect every page, preferably in Microsoft Word; fix clipping and broken pagination without altering the BTO design. If no renderer works, disclose that visual verification remains incomplete rather than calling it exact. Report font substitution if detected.
+
+Perform two separate QA passes: first reconcile every role, date, client, qualification, skill, language and quantified claim against the source; then inspect every rendered page for banner size, square markers, wrapping, spacing, orphan headings and blank pages. Generator tests prove normalized input preservation, not factual accuracy against an unseen original CV. Preserve clients and technologies in employer continuation lines or responsibilities when the source includes them; never discard them because the schema has no dedicated field.
 
 Return the finished .docx as the primary deliverable, with a brief note on the template revision and any unresolved source information. PDF/HTML are optional only if requested. Never commit candidate data, generated CVs or the original candidate source to GitHub as part of conversion.
 
