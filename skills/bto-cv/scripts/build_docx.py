@@ -32,6 +32,20 @@ def strings(value, label):
             raise ValueError(label + ' must contain content only, without a typed bullet prefix')
     return result
 
+def language_label(value):
+    """Apply the user's display labels without dropping languages or guessing levels."""
+    levels={'native':'Native','mother tongue':'Native','fluent':'Fluent','c1':'Fluent','c2':'Fluent',
+            'b2':'Full Professional','basic':'Professional','a1':'Professional','a2':'Professional',
+            'b1':'Professional','professional':'Professional','full professional':'Full Professional'}
+    match=re.match(r'^(.*?)\s*(?:[-\u2013\u2014:]\s*|\(\s*|\s+)(?:CEFR\s+)?(mother tongue|full professional|professional|native|fluent|basic|[ABC][12])\b(.*)$',value,re.I)
+    if not match:return value
+    name=match[1].strip()
+    if not name:raise ValueError('Language name missing: '+value)
+    # Retain supplied certification notes, but never display CEFR tokens.
+    note=re.sub(r'\b[ABC][12]\b','',match[3],flags=re.I).strip(' /,;:-)')
+    if note.startswith('(') and not note.endswith(')'):note+=')'
+    return name+' ('+levels[match[2].lower()]+')'+(' '+note if note else '')
+
 def validate_lists(prototypes, parts):
     """Fail before writing if any list slot has lost its native square numbering."""
     numbering=minidom.parseString(parts['word/numbering.xml'])
@@ -67,6 +81,7 @@ def normalize(data):
     result={'initials':string(data.get('initials'),'initials')}
     for key in ['education','certifications','languages']:
         result[key]=strings(data.get(key,[]),key)
+    result['languages']=[language_label(v) for v in result['languages']]
     for key,fields in [('experience',{'dates','role','employer','bullets'}),('skills',{'category','bullets'})]:
         items=data.get(key,[])
         if not isinstance(items,list): raise ValueError(key+' must be a list')

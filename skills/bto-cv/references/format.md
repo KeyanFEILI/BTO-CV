@@ -27,3 +27,7 @@ Use the master bundled beside the installed generator. Do not download the lates
 ## Verification
 
 Run automated tests. Reconcile all normalized content against the original CV, preserving date precision, client names, language levels and quantified claims. Then render with Word or a supported renderer and inspect every page for banner, square glyphs, spacing, wrapping, section order, orphan headings, split bullets and blank pages. Compare against references using the same renderer, fonts and resolution. XML checks prove structure and unchanged package parts, not visual equivalence or factual truth of source claims. Disclose incomplete rendering rather than claim an exact visual match.
+
+## Language display rules
+
+Keep all languages in source order, including A1/A2/B1 and Basic. Use Language (Level), without CEFR labels: Native/mother tongue → Native; Fluent/C1/C2 → Fluent; B2 → Full Professional; Basic/A1/A2/B1 → Professional. The generator enforces this explicit user mapping. Preserve supplied certification notes; never infer missing levels or native status from nationality. Unrecognized descriptions remain unchanged.
