@@ -1,4 +1,5 @@
 import hashlib,importlib.util,json,tempfile,unittest,zipfile
+from unittest.mock import patch
 from pathlib import Path
 from xml.dom import minidom
 ROOT=Path(__file__).resolve().parents[1]
@@ -7,6 +8,36 @@ spec=importlib.util.spec_from_file_location('builder',SKILL/'scripts/build_docx.
 builder=importlib.util.module_from_spec(spec);spec.loader.exec_module(builder)
 W=builder.W
 class NativeWordTests(unittest.TestCase):
+ def test_installed_pair_generates_offline_from_any_working_directory(self):
+  data=json.loads((SKILL/'references/input-example.json').read_text())
+  with tempfile.TemporaryDirectory() as tmp:
+   output=Path(tmp)/'cv.docx'
+   # Neither a current checkout nor Git credentials are needed for conversion.
+   import os
+   previous=Path.cwd()
+   try:
+    os.chdir(tmp)
+    with patch('socket.create_connection',side_effect=AssertionError('Network used')),patch('subprocess.run',side_effect=AssertionError('Git/CLI used')):
+     builder.build(data,output)
+   finally:os.chdir(previous)
+   with zipfile.ZipFile(output) as z:
+    content=builder.text(minidom.parseString(z.read('word/document.xml')))
+    self.assertIn('Product Owner',content);self.assertNotIn('{{',content)
+
+ def test_incompatible_external_master_can_recover_with_installed_pair(self):
+  data={'initials':'A.E.','languages':['English']}
+  with tempfile.TemporaryDirectory() as tmp:
+   template=Path(tmp)/'external.docx';output=Path(tmp)/'cv.docx'
+   with zipfile.ZipFile(SKILL/'assets/BTO_CV_Template.docx') as src,zipfile.ZipFile(template,'w') as dst:
+    for name in src.namelist():dst.writestr(name,src.read(name).replace(b'{{layout_rr_afr_v1}}',b'{{other_release}}') if name=='word/document.xml' else src.read(name))
+   with self.assertRaisesRegex(ValueError,'omit --template'):
+    builder.build(data,output,template)
+   self.assertFalse(output.exists())
+   builder.build(data,output)
+   with zipfile.ZipFile(output) as z:
+    content=builder.text(minidom.parseString(z.read('word/document.xml')))
+    self.assertIn('English',content);self.assertNotIn('other_release',content)
+
  def test_reference_banner_fonts_numbering_and_margins(self):
   with zipfile.ZipFile(SKILL/'assets/BTO_CV_Template.docx') as z:
    self.assertEqual(hashlib.sha256(z.read('word/media/image1.png')).hexdigest(),'aaa03ec16e78150da31f576946e12651c07167defe1b03fc382d9d9146b12cfc')

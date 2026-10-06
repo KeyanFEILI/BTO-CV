@@ -20,6 +20,10 @@ The generator changes only word/document.xml. Styles, numbering, theme, relation
 
 HTML is a secondary browser approximation and never the DOCX source.
 
+## Paired release selection
+
+Use the master bundled beside the installed generator. Do not download the latest main-branch template into an older release. Updates replace the whole installed package through the existing SessionStart updater. Offline generation uses the installed pair without Git authentication or a fallback approval. Record the installed plugin version; a remote release's version does not prove that its instructions were loaded in the current chat. An explicitly supplied incompatible master must fail before output is written; normal conversion can then retry using the bundled pair.
+
 ## Verification
 
 Run automated tests. Reconcile all normalized content against the original CV, preserving date precision, client names, language levels and quantified claims. Then render with Word or a supported renderer and inspect every page for banner, square glyphs, spacing, wrapping, section order, orphan headings, split bullets and blank pages. Compare against references using the same renderer, fonts and resolution. XML checks prove structure and unchanged package parts, not visual equivalence or factual truth of source claims. Disclose incomplete rendering rather than claim an exact visual match.
