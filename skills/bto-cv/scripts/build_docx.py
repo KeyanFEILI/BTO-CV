@@ -97,7 +97,8 @@ def build(data, output, template=None):
     prototypes={text(p):p for p in paras}
     required=['layout_rr_afr_v1','initials','dates','role','employer','responsibilities','experience_bullet','education_bullet','skill_category','skill_bullet','certification_bullet','language_bullet']
     for slot in required:
-        if '{{'+slot+'}}' not in prototypes: raise ValueError('Template slot missing: '+slot)
+        if '{{'+slot+'}}' not in prototypes:
+            raise ValueError('Template slot missing: '+slot+'. Template and generator are incompatible; use the master bundled with this installed generator (omit --template).')
     for heading in HEADINGS:
         if heading not in prototypes: raise ValueError('Template heading missing: '+heading)
     validate_lists(prototypes,parts)
