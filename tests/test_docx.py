@@ -13,7 +13,7 @@ class NativeWordTests(unittest.TestCase):
    for entry in ['French - '+source,'French ('+source+')','French: '+source.lower()]:
     with self.subTest(entry=entry):self.assertEqual(builder.language_label(entry),'French ('+expected+')')
   data={'initials':'T.E.','languages':['French (Native)','English - C2','Spanish - A1','German - B1','Italian - B2','Japanese','Dutch - Intermediate','Portuguese - C2 (Business certified)','French - B1 (DELF certified)']}
-  expected=['French (Native)','English (Fluent)','Spanish (Professional)','German (Professional)','Italian (Full Professional)','Japanese','Dutch - Intermediate','Portuguese (Fluent) (Business certified)','French (Professional) (DELF certified)']
+  expected=['French (Native)','English (Fluent)','Spanish (Professional)','German (Professional)','Italian (Full Professional)','Japanese','Dutch (Intermediate)','Portuguese (Fluent)','French (Professional)']
   self.assertEqual(builder.normalize(data)['languages'],expected)
   self.assertEqual(builder.language_label('French (CEFR B1)'),'French (Professional)')
   self.assertEqual(builder.language_label('English (Fluent / C2)'),'English (Fluent)')
@@ -22,7 +22,32 @@ class NativeWordTests(unittest.TestCase):
    output=Path(tmp)/'cv.docx';builder.build(data,output)
    with zipfile.ZipFile(output) as z:doc=minidom.parseString(z.read('word/document.xml'))
    paras=doc.getElementsByTagNameNS(W,'p')
-   self.assertEqual([builder.text(p) for p in paras if p.getElementsByTagNameNS(W,'numPr')],expected)
+   self.assertEqual([builder.text(p) for p in paras if p.getElementsByTagNameNS(W,'numPr')],['Portuguese - Business certified','French - DELF certified']+expected)
+ def test_language_exams_move_to_certifications_without_losing_details(self):
+  data={'initials':'T.E.','certifications':['French - DELF B1 certified, 2022'],
+        'languages':['French (B1) (DELF B1 certified, 2022)','English: proficient (C1)','Spanish (B2 CEFR)',
+                     'German - B2 (Goethe-Zertifikat B2, 2023)','English (C1, IELTS 8.0, 2024)',
+                     'Japanese (JLPT N2, 2021)','Italian IELTS 6.5']}
+  normalized=builder.normalize(data)
+  self.assertEqual(normalized['languages'],['French (Professional)','English (Fluent)','Spanish (Full Professional)',
+                   'German (Full Professional)','English (Fluent)','Japanese','Italian'])
+  self.assertEqual(normalized['certifications'],['French - DELF B1 certified, 2022','German - Goethe-Zertifikat B2, 2023',
+                   'English - IELTS 8.0, 2024','Japanese - JLPT N2, 2021','Italian - IELTS 6.5'])
+  self.assertEqual(builder.normalize(normalized),normalized)
+  self.assertEqual(data['certifications'],['French - DELF B1 certified, 2022'])
+  with tempfile.TemporaryDirectory() as tmp:
+   output=Path(tmp)/'cv.docx';builder.build(data,output)
+   with zipfile.ZipFile(output) as z:doc=minidom.parseString(z.read('word/document.xml'))
+   content=[builder.text(p) for p in builder.children(doc.getElementsByTagNameNS(W,'body')[0],'p') if builder.text(p)]
+   self.assertEqual(content,['T.E.','CERTIFICATIONS AND TRAINING']+normalized['certifications']+['LANGUAGES']+normalized['languages'])
+ def test_language_ranges_do_not_guess_or_leak_cefr(self):
+  self.assertEqual(builder.language_label('English (C1/C2)'),'English (Fluent)')
+  self.assertEqual(builder.language_label('French (A1 / A2 / B1)'),'French (Professional)')
+  self.assertEqual(builder.language_label('French-B1'),'French (Professional)')
+  self.assertEqual(builder.language_parts('English - C1; IELTS (8.0, 2024)'),('English (Fluent)',['English - IELTS (8.0, 2024)']))
+  self.assertEqual(builder.language_parts('English (IELTS 7.5, planned)'),('English',['English - IELTS 7.5, planned']))
+  for value in ['German B1/B2','English (Fluent / Native)','English - C1 (business use)', 'French (B1 (DELF))']:
+   with self.subTest(value=value),self.assertRaises(ValueError):builder.normalize({'initials':'T.E.','languages':[value]})
  def test_exact_blank_lines_for_jobs_and_optional_sections(self):
   for mask in range(32):
    data={'initials':'T.E.'}

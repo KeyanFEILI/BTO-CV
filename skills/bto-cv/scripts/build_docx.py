@@ -32,19 +32,57 @@ def strings(value, label):
             raise ValueError(label + ' must contain content only, without a typed bullet prefix')
     return result
 
-def language_label(value):
-    """Apply the user's display labels without dropping languages or guessing levels."""
-    levels={'native':'Native','mother tongue':'Native','fluent':'Fluent','c1':'Fluent','c2':'Fluent',
-            'b2':'Full Professional','basic':'Professional','a1':'Professional','a2':'Professional',
-            'b1':'Professional','professional':'Professional','full professional':'Full Professional'}
-    match=re.match(r'^(.*?)\s*(?:[-\u2013\u2014:]\s*|\(\s*|\s+)(?:CEFR\s+)?(mother tongue|full professional|professional|native|fluent|basic|[ABC][12])\b(.*)$',value,re.I)
-    if not match:return value
-    name=match[1].strip()
+LANGUAGE_LEVELS={'native':'Native','mother tongue':'Native','fluent':'Fluent','c1':'Fluent','c2':'Fluent',
+                'b2':'Full Professional','basic':'Professional','a1':'Professional','a2':'Professional',
+                'b1':'Professional','professional':'Professional','full professional':'Full Professional'}
+LEVEL_PATTERN=r'\b(?:mother tongue|full professional|professional|native|fluent|basic|[ABC][12])\b'
+EXAM_PATTERN=r'\b(?:IELTS|TOEFL|TOEIC|DELF|DALF|DILF|TCF|TEF|Cambridge|Goethe|TestDaF|telc|DELE|SIELE|CELI|CILS|HSK|JLPT|OET|PTE|Duolingo|Linguaskill|FCE|CAE|CPE|BULATS|certificat\w*|certified|exam\w*|test|diploma|score)\b'
+
+def language_parts(value):
+    """Separate explicit proficiency from supplied exams; never infer a level from a score."""
+    boundary=re.search(r'\(|:|\s+[-\u2013\u2014]\s*|[-\u2013\u2014](?=(?:CEFR\s+)?'+LEVEL_PATTERN+r')',value,re.I)
+    if boundary is None:
+        boundary=re.search(r'\s+(?=(?:CEFR\s+)?'+LEVEL_PATTERN+r')',value,re.I)
+    if boundary is None:
+        boundary=re.search(r'\s+(?='+EXAM_PATTERN+r')',value,re.I)
+    if boundary is None:return value,[]
+    name=value[:boundary.start()].strip()
     if not name:raise ValueError('Language name missing: '+value)
-    # Retain supplied certification notes, but never display CEFR tokens.
-    note=re.sub(r'\b[ABC][12]\b','',match[3],flags=re.I).strip(' /,;:-)')
-    if note.startswith('(') and not note.endswith(')'):note+=')'
-    return name+' ('+levels[match[2].lower()]+')'+(' '+note if note else '')
+    remainder=value[boundary.start():].strip(' :-\u2013\u2014')
+    # Keep entire exam notes, including CEFR exam names, scores and dates.
+    chunks=re.findall(r'\(([^()]*)\)|([^()]+)',remainder)
+    if re.sub(r'\([^()]*\)|[^()]+','',remainder):
+        raise ValueError('Unclear language parentheses; separate proficiency and certifications: '+value)
+    proficiency=[];certifications=[]
+    for group,plain in chunks:
+        for chunk in re.split(r'\s*;\s*',group or plain):
+            chunk=chunk.strip(' /,;:-')
+            if not chunk:continue
+            exam=re.search(EXAM_PATTERN,chunk,re.I)
+            if exam:
+                # "C1, IELTS 8.0" has an explicit level before the exam name.
+                prefix=chunk[:exam.start()].strip(' /,;:-')
+                if prefix and re.fullmatch(r'(?:CEFR\s+)?'+LEVEL_PATTERN,prefix,re.I):
+                    proficiency.append(prefix);note=chunk[exam.start():].strip()
+                else:note=chunk
+                certifications.append(name+' - '+note)
+            elif group and certifications and re.match(r'^(?:\d|score\b|passed\b|taken\b|planned\b|pending\b)',chunk,re.I):
+                certifications[-1]+=' ('+chunk+')'
+            else:proficiency.append(chunk)
+    mapped=[];unknown=[]
+    for part in proficiency:
+        matches=list(re.finditer(LEVEL_PATTERN,part,re.I))
+        mapped.extend(LANGUAGE_LEVELS[m.group().lower()] for m in matches)
+        residue=re.sub(LEVEL_PATTERN,'',part,flags=re.I)
+        residue=re.sub(r'\b(?:CEFR|level|proficiency|proficient)\b','',residue,flags=re.I).strip(' /,;:-')
+        if residue:unknown.append(residue)
+    if len(set(mapped))>1 or (mapped and unknown) or len(unknown)>1:
+        raise ValueError('Ambiguous language proficiency; resolve from the original CV: '+value)
+    level=mapped[0] if mapped else unknown[0] if unknown else ''
+    return name+(' ('+level+')' if level else ''),certifications
+
+def language_label(value):
+    return language_parts(value)[0]
 
 def validate_lists(prototypes, parts):
     """Fail before writing if any list slot has lost its native square numbering."""
@@ -81,7 +119,14 @@ def normalize(data):
     result={'initials':string(data.get('initials'),'initials')}
     for key in ['education','certifications','languages']:
         result[key]=strings(data.get(key,[]),key)
-    result['languages']=[language_label(v) for v in result['languages']]
+    languages=[]
+    for value in result['languages']:
+        label,certifications=language_parts(value)
+        languages.append(label)
+        for certificate in certifications:
+            if certificate.casefold() not in {v.casefold() for v in result['certifications']}:
+                result['certifications'].append(certificate)
+    result['languages']=languages
     for key,fields in [('experience',{'dates','role','employer','bullets'}),('skills',{'category','bullets'})]:
         items=data.get(key,[])
         if not isinstance(items,list): raise ValueError(key+' must be a list')
