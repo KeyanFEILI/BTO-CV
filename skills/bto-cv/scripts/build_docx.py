@@ -5,6 +5,7 @@ from copy import deepcopy
 import json
 from pathlib import Path
 import re
+import sys
 import zipfile
 from xml.dom import minidom
 
@@ -33,26 +34,44 @@ def strings(value, label):
     return result
 
 LANGUAGE_LEVELS={'native':'Native','mother tongue':'Native','fluent':'Fluent','c1':'Fluent','c2':'Fluent',
-                'b2':'Full Professional','basic':'Professional','a1':'Professional','a2':'Professional',
-                'b1':'Professional','professional':'Professional','full professional':'Full Professional'}
-LEVEL_PATTERN=r'\b(?:mother tongue|full professional|professional|native|fluent|basic|[ABC][12])\b'
+                'b2':'Professional','professional working proficiency':'Professional',
+                'full professional proficiency':'Professional','professional':'Professional',
+                'basic':None,'a1':None,'a2':None,'b1':None,'intermediate':None,'beginner':None,
+                'elementary':None,'limited proficiency':None}
+LEVEL_PATTERN=r'\b(?:mother tongue|professional working proficiency|full professional proficiency|limited proficiency|professional|native|fluent|intermediate|beginner|elementary|basic|[ABC][12])\b'
+# Canonical English names; common source-language spellings are explicit aliases.
+LANGUAGE_NAMES={name.casefold():name for name in (
+    'Afrikaans Albanian Amharic Arabic Armenian Azerbaijani Basque Belarusian Bengali Bosnian Bulgarian '
+    'Burmese Catalan Cantonese Chinese Croatian Czech Danish Dutch English Estonian Finnish French '
+    'Georgian German Greek Gujarati Hebrew Hindi Hungarian Icelandic Indonesian Irish Italian Japanese '
+    'Kannada Kazakh Khmer Korean Kurdish Lao Latin Latvian Lithuanian Luxembourgish Macedonian Malay '
+    'Malayalam Maltese Mandarin Marathi Mongolian Nepali Norwegian Pashto Persian Polish Portuguese '
+    'Punjabi Romanian Russian Serbian Sinhala Slovak Slovenian Somali Spanish Swahili Swedish Tagalog '
+    'Tamil Telugu Thai Turkish Ukrainian Urdu Uzbek Vietnamese Welsh Zulu').split()}
+LANGUAGE_NAMES.update({'français':'French','francais':'French','deutsch':'German','español':'Spanish',
+                       'espanol':'Spanish','italiano':'Italian','português':'Portuguese',
+                       'portugues':'Portuguese','русский':'Russian','английский':'English',
+                       'nederlands':'Dutch','中文':'Chinese','日本語':'Japanese','한국어':'Korean'})
 EXAM_PATTERN=r'\b(?:IELTS|TOEFL|TOEIC|DELF|DALF|DILF|TCF|TEF|Cambridge|Goethe|TestDaF|telc|DELE|SIELE|CELI|CILS|HSK|JLPT|OET|PTE|Duolingo|Linguaskill|FCE|CAE|CPE|BULATS|certificat\w*|certified|exam\w*|test|diploma|score)\b'
 
-def language_parts(value):
+def language_parts(value, review=None):
     """Separate explicit proficiency from supplied exams; never infer a level from a score."""
     boundary=re.search(r'\(|:|\s+[-\u2013\u2014]\s*|[-\u2013\u2014](?=(?:CEFR\s+)?'+LEVEL_PATTERN+r')',value,re.I)
     if boundary is None:
         boundary=re.search(r'\s+(?=(?:CEFR\s+)?'+LEVEL_PATTERN+r')',value,re.I)
     if boundary is None:
         boundary=re.search(r'\s+(?='+EXAM_PATTERN+r')',value,re.I)
-    if boundary is None:return value,[]
+    if boundary is None:
+        if review is not None:review.append(value+' - omitted: no stated proficiency')
+        return None,[]
     name=value[:boundary.start()].strip()
     if not name:raise ValueError('Language name missing: '+value)
     remainder=value[boundary.start():].strip(' :-\u2013\u2014')
     # Keep entire exam notes, including CEFR exam names, scores and dates.
     chunks=re.findall(r'\(([^()]*)\)|([^()]+)',remainder)
     if re.sub(r'\([^()]*\)|[^()]+','',remainder):
-        raise ValueError('Unclear language parentheses; separate proficiency and certifications: '+value)
+        if review is not None:review.append(value+' - omitted: unclear language parentheses')
+        return None,[]
     proficiency=[];certifications=[]
     for group,plain in chunks:
         for chunk in re.split(r'\s*;\s*',group or plain):
@@ -73,13 +92,24 @@ def language_parts(value):
     for part in proficiency:
         matches=list(re.finditer(LEVEL_PATTERN,part,re.I))
         mapped.extend(LANGUAGE_LEVELS[m.group().lower()] for m in matches)
+        if any(m.group().lower() in ('native','mother tongue') for m in matches):
+            if not re.fullmatch(r'(?:native(?: speaker)?|mother tongue)',part,re.I):
+                unknown.append('native status is not explicitly stated')
         residue=re.sub(LEVEL_PATTERN,'',part,flags=re.I)
         residue=re.sub(r'\b(?:CEFR|level|proficiency|proficient)\b','',residue,flags=re.I).strip(' /,;:-')
+        if re.fullmatch(r'native speaker',part,re.I):residue=''
         if residue:unknown.append(residue)
-    if len(set(mapped))>1 or (mapped and unknown) or len(unknown)>1:
-        raise ValueError('Ambiguous language proficiency; resolve from the original CV: '+value)
-    level=mapped[0] if mapped else unknown[0] if unknown else ''
-    return name+(' ('+level+')' if level else ''),certifications
+    canonical=LANGUAGE_NAMES.get(name.casefold())
+    reason=None
+    if not canonical:reason='language name requires English-name review'
+    elif len(set(mapped))>1:reason='conflicting proficiency evidence'
+    elif unknown:reason='ambiguous proficiency description'
+    elif not mapped:reason='no stated proficiency; exams alone do not establish a level'
+    elif mapped[0] is None:reason='below Professional working proficiency'
+    if reason:
+        if review is not None:review.append(value+' - omitted: '+reason)
+        return None,certifications
+    return canonical+' ('+mapped[0]+')',certifications
 
 def language_label(value):
     return language_parts(value)[0]
@@ -113,20 +143,32 @@ def validate_lists(prototypes, parts):
 
 def normalize(data):
     if not isinstance(data, dict): raise ValueError('Candidate data must be an object')
-    allowed={'initials','experience','education','skills','certifications','languages'}
+    allowed={'initials','experience','education','skills','certifications','languages','language_review'}
     unknown=set(data)-allowed
     if unknown: raise ValueError('Unmapped fields: '+', '.join(sorted(unknown)))
     result={'initials':string(data.get('initials'),'initials')}
     for key in ['education','certifications','languages']:
         result[key]=strings(data.get(key,[]),key)
-    languages=[]
+    languages=[];evidence={};review=strings(data.get('language_review',[]),'language_review')
     for value in result['languages']:
-        label,certifications=language_parts(value)
-        languages.append(label)
+        label,certifications=language_parts(value,review)
+        if label:languages.append(label)
+        for spelling,name in LANGUAGE_NAMES.items():
+            if re.match(re.escape(spelling)+r'(?=$|[\s(:\-\u2013\u2014])',value,re.I):
+                evidence.setdefault(name,[]).append(label)
+                break
         for certificate in certifications:
             if certificate.casefold() not in {v.casefold() for v in result['certifications']}:
                 result['certifications'].append(certificate)
     result['languages']=languages
+    # Multiple entries for the same language must not conceal conflicting levels.
+    for name,values in evidence.items():
+        entries=set(values)
+        if len(entries)>1:
+            languages[:]=[label for label in languages if not label.startswith(name+' (')]
+            review.append(name+' - omitted: conflicting proficiency evidence across entries')
+    result['languages']=list(dict.fromkeys(languages))
+    if review:result['language_review']=list(dict.fromkeys(review))
     for key,fields in [('experience',{'dates','role','employer','bullets'}),('skills',{'category','bullets'})]:
         items=data.get(key,[])
         if not isinstance(items,list): raise ValueError(key+' must be a list')
@@ -140,7 +182,7 @@ def normalize(data):
                 record[field]=string(value,field) if value.strip() else ''
             if not any(record.values()): raise ValueError('Empty '+key+' entry')
             result[key].append(record)
-    if not any(result[k] for k in allowed-{'initials'}): raise ValueError('No CV content supplied')
+    if not any(result.get(k) for k in allowed-{'initials'}): raise ValueError('No CV content supplied')
     return result
 
 def build(data, output, template=None):
@@ -228,8 +270,9 @@ def main():
     parser.add_argument('output',type=Path,help='New .docx output file')
     parser.add_argument('--template',type=Path,help='Explicit approved DOCX master')
     args=parser.parse_args()
-    try:build(json.loads(args.input.read_text(encoding='utf-8-sig')),args.output,args.template)
+    try:data=build(json.loads(args.input.read_text(encoding='utf-8-sig')),args.output,args.template)
     except (ValueError,KeyError,OSError,zipfile.BadZipFile) as error:parser.exit(1,str(error)+'\n')
     print('Created '+str(args.output))
+    for note in data.get('language_review',[]):print('Language review: '+note,file=sys.stderr)
 
 if __name__=='__main__': main()

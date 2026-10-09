@@ -61,6 +61,8 @@ This private marketplace requires initial GitHub access and marketplace registra
 
 ## Exact formatting and conversion
 
+Version 3.2.6 displays only source-supported languages at professional working proficiency or above, using English names and the labels Native, Fluent and Professional. Lower levels are omitted without upgrading; missing, ambiguous or conflicting levels are flagged separately for review. Exam scores never establish proficiency. Language-section formatting is unchanged, and an empty section is omitted.
+
 The generator clones native Word paragraph prototypes and preserves the embedded banner, numbering, styles and page settings. It does not convert HTML to Word. IT skills, education, certificates and languages use native bullets as well as job responsibilities. Body content remains editable. Different candidate lengths naturally change pagination; fonts and rendering software can also affect page breaks. D.P. is the only formatting authority, documented in `skills/bto-cv/references/format.md`.
 
 The agent extracts candidate information into temporary JSON and runs the bundled Python 3 generator. Users only provide their original CV; they do not need to prepare JSON. Optional HTML is a secondary preview and cannot override the Word master.
