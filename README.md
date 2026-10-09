@@ -4,11 +4,13 @@ Give the plugin an original PDF or Word CV and receive an editable **BTO .docx**
 
 ## Talent Pool workflow (3.3.0)
 
-The same plugin now includes `skills/bto-talent-pool`, which calls the existing `skills/bto-cv` converter and reuses its verified DOCX. There is one Word template and one generator. Both skills ship and update together through `bto-cv@bto-cv-marketplace`; no standalone Talent Pool skill is needed.
+The repository now contains two separate skills: the existing `skills/bto-cv` converter and the new `skills/trello` candidate-card workflow. The converter skill is unchanged and has no Trello dependency. Both skills ship and update together through `bto-cv@bto-cv-marketplace`.
 
 With Trello connected and access to the BTO LUX Talent Pool board, attach an original CV and ask:
 
-> Add this CV to the Talent Pool, create its BTO Word CV, and attach both the original and BTO CVs.
+> $bto-cv $trello — Convert this CV and create its Talent Pool card with both the original and BTO CVs attached.
+
+Use `$bto-cv` alone for conversion only. Use `$trello` alone with an original CV and an existing BTO CV for card creation without regenerating the document. Combined invocation runs conversion once, then hands the finished DOCX to Trello and returns both the document and card link. User shorthand such as `/btocv /trello` can express the same intent in a message; the package does not register custom slash-command aliases.
 
 The workflow checks for an existing candidate, prepares a concise profile and structured fields, selects the appropriate New list, and applies seniority based on total experience. Hybrid roles use `/`, unknown field values stay empty, exactly 5 years is Mid, and exactly 10 years is Senior. Reviewed means screened/interviewed; processing a CV alone does not change that status. When a client submission is requested, copy the pool card into the relevant opportunity group and retain its pool original.
 
@@ -16,7 +18,7 @@ CV-only conversion still produces a DOCX without creating Trello cards. An alrea
 
 The current Trello connector supports card creation and labels but does not expose file uploads or native copying. Completing both attachments or a client copy therefore requires an authenticated browser session with those capabilities. The workflow verifies both attachments and reports incomplete steps if unavailable; it does not claim that card creation alone completes the task.
 
-After this release is merged, update the existing plugin and start a new chat. Verify that both plugin skills are available before retiring any personal standalone `bto-talent-pool` skill created during setup. The updater already refreshes the entire plugin; no additional hook or second installation is needed.
+After this release is merged, update the existing plugin and start a new chat. Verify that both `bto-cv` and `trello` skills are available before retiring any personal standalone `bto-talent-pool` skill created during setup. The updater already refreshes the entire plugin; no additional hook or second installation is needed.
 
 Version 3.1 uses one native Word template derived exclusively from D.P. The original D.P. banner, square list markers, first-job indentation, later-job alignment and paragraph spacing are retained. There is no layout switch. The original candidate files are not distributed.
 

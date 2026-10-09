@@ -16,7 +16,7 @@
         "defaultPrompt": [
           "Convert the attached original CV into an editable BTO Word document.",
           "Create a fictional BTO Word CV to test the formatting and native bullet lists.",
-          "Add the attached CV to the Talent Pool, create its BTO Word CV, and attach both CVs to the candidate card."
+          "$bto-cv $trello — Convert the attached CV and create its Talent Pool card with both CVs attached."
         ],
         "brandColor": "#00665E",
         "longDescription": "Create an editable .docx using the BTO reference banner, Century Gothic fonts, measured spacing and native square bullet lists. Preserves supplied facts. Includes a deterministic Word generator and optional HTML preview. When requested, create and organize Talent Pool candidate cards using the same converter, with both original and BTO CV attachments. Requires Trello access; attachment uploads and client copies may require an authenticated browser session."
