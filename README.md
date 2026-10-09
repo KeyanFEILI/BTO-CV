@@ -2,6 +2,26 @@
 
 Give the plugin an original PDF or Word CV and receive an editable **BTO .docx**, with the original banner, Century Gothic typography, measured spacing and real square bullet lists.
 
+## Talent Pool workflow (3.3.0)
+
+The repository now contains two separate skills: the existing `skills/bto-cv` converter and the new `skills/trello` candidate-card workflow. The converter skill is unchanged and has no Trello dependency. Both skills ship and update together through `bto-cv@bto-cv-marketplace`.
+
+With Trello connected and access to the BTO LUX Talent Pool board, attach an original CV and ask:
+
+> $bto-cv $trello — Convert this CV and create its Talent Pool card with both the original and BTO CVs attached.
+
+Use `$bto-cv` alone for conversion only. Use `$trello` alone with an original CV and an existing BTO CV for card creation without regenerating the document. Combined invocation runs conversion once, then hands the finished DOCX to Trello and returns both the document and card link. User shorthand such as `/btocv /trello` can express the same intent in a message; the package does not register custom slash-command aliases.
+
+The workflow checks for an existing candidate, prepares a concise profile and structured fields, selects the appropriate New list, and applies seniority based on total experience. Hybrid roles use `/`, unknown field values stay empty, exactly 5 years is Mid, and exactly 10 years is Senior. Reviewed means screened/interviewed; processing a CV alone does not change that status. When a client submission is requested, copy the pool card into the relevant opportunity group and retain its pool original.
+
+CV-only conversion still produces a DOCX without creating Trello cards. An already verified DOCX from the same original in the current task is reused. Candidate CVs and working data stay outside this repository.
+
+The Trello connector creates cards and labels. The bundled local Windows uploader sends both CVs directly to Trello, using Python's standard library and Windows Credential Manager, with no paid automation service or extra file host. See [one-time authorization and setup](skills/trello/references/uploader-setup.md). The uploader accepts only an open card on the private BTO LUX Talent Pool board, checks for matching uploads before retrying, and verifies both attachment records. Keep candidate files outside this repository.
+
+This requires a separate one-time Trello API key/token authorization; the helper cannot reuse the connector's credentials. Enter secrets only in the local masked setup window. Offline tests pass, but Windows credential persistence and a live fictional-CV upload must be verified after setup. Client copies can use an authenticated browser, or connector-created copies with the same local files attached by the uploader.
+
+After this release is merged, update the existing plugin and start a new chat. Verify that both `bto-cv` and `trello` skills are available before retiring any personal standalone `bto-talent-pool` skill created during setup. The updater already refreshes the entire plugin; no additional hook or second installation is needed.
+
 Version 3.1 uses one native Word template derived exclusively from D.P. The original D.P. banner, square list markers, first-job indentation, later-job alignment and paragraph spacing are retained. There is no layout switch. The original candidate files are not distributed.
 
 ## Start here

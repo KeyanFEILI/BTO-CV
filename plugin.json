@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "bto-cv",
-  "version": "3.2.5",
-  "description": "Convert original CVs into editable BTO Word documents using the shared R.R./A.F.R. layout and its native square bullet lists.",
+  "version": "3.3.0",
+  "description": "Convert original CVs into editable BTO Word documents and organize candidates in the Trello Talent Pool using the shared converter.",
   "author": {
     "name": "Keyan FEILI"
   },
@@ -11,14 +11,15 @@
     "com.openai": {
       "interface": {
         "displayName": "BTO CV",
-        "shortDescription": "Original CV in. Editable BTO Word CV out.",
+        "shortDescription": "BTO Word CVs and Trello candidate cards.",
         "category": "Productivity",
         "defaultPrompt": [
           "Convert the attached original CV into an editable BTO Word document.",
-          "Create a fictional BTO Word CV to test the formatting and native bullet lists."
+          "Create a fictional BTO Word CV to test the formatting and native bullet lists.",
+          "$bto-cv $trello — Convert the attached CV and create its Talent Pool card with both CVs attached."
         ],
         "brandColor": "#00665E",
-        "longDescription": "Create an editable .docx using the BTO reference banner, Century Gothic fonts, measured spacing and native square bullet lists. Preserves supplied facts. Includes a deterministic Word generator and optional HTML preview."
+        "longDescription": "Create an editable .docx using the BTO reference banner, Century Gothic fonts, measured spacing and native square bullet lists. Preserves supplied facts. Includes a deterministic Word generator and optional HTML preview. A separate Trello skill can create Talent Pool cards and attach original and BTO CVs using the bundled local Windows uploader. Requires Trello access and one-time local credential setup; no extra paid automation service."
       },
       "hooks": "./hooks/hooks.json"
     }
