@@ -5,6 +5,10 @@ description: Convert original candidate CVs into editable BTO Word documents wit
 
 # BTO CV Word conversion
 
+## Talent Pool integration
+
+When the user asks to add a CV/candidate to the Trello Talent Pool or organize a client submission, read [the sibling Talent Pool skill](../bto-talent-pool/SKILL.md). When conversion is needed, complete CV generation and verification here, then pass that finished DOCX, the unchanged original CV, and the source facts to the Talent Pool workflow. Reuse verified files already available in the task or on the existing card for a client copy. Keep candidate files and intermediate data in the task's workspace, outside this plugin repository. Do not generate the DOCX a second time during the Trello handoff. A conversion-only request remains a conversion-only request; do not create a Trello card unless requested.
+
 When the user supplies an original CV, convert it directly into a finished editable .docx. Do not ask them to fill a schema or choose a format. Do not return HTML or PDF instead of Word. Read references/format.md for the measured BTO layout. Use the R.R./A.F.R. design with the user-approved corrections: left/right margins 2 cm, top 1.5 cm, bottom 1.25 cm; one blank body line between experience entries and two between populated major sections. These corrections override older reference spacing and margins. Use only assets/BTO_CV_Template.docx with this generator. Do not recreate a different layout. HTML is a secondary browser preview only and never the Word-generation source.
 
 ## Read and map the candidate

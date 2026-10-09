@@ -2,6 +2,22 @@
 
 Give the plugin an original PDF or Word CV and receive an editable **BTO .docx**, with the original banner, Century Gothic typography, measured spacing and real square bullet lists.
 
+## Talent Pool workflow (3.3.0)
+
+The same plugin now includes `skills/bto-talent-pool`, which calls the existing `skills/bto-cv` converter and reuses its verified DOCX. There is one Word template and one generator. Both skills ship and update together through `bto-cv@bto-cv-marketplace`; no standalone Talent Pool skill is needed.
+
+With Trello connected and access to the BTO LUX Talent Pool board, attach an original CV and ask:
+
+> Add this CV to the Talent Pool, create its BTO Word CV, and attach both the original and BTO CVs.
+
+The workflow checks for an existing candidate, prepares a concise profile and structured fields, selects the appropriate New list, and applies seniority based on total experience. Hybrid roles use `/`, unknown field values stay empty, exactly 5 years is Mid, and exactly 10 years is Senior. Reviewed means screened/interviewed; processing a CV alone does not change that status. When a client submission is requested, copy the pool card into the relevant opportunity group and retain its pool original.
+
+CV-only conversion still produces a DOCX without creating Trello cards. An already verified DOCX from the same original in the current task is reused. Candidate CVs and working data stay outside this repository.
+
+The current Trello connector supports card creation and labels but does not expose file uploads or native copying. Completing both attachments or a client copy therefore requires an authenticated browser session with those capabilities. The workflow verifies both attachments and reports incomplete steps if unavailable; it does not claim that card creation alone completes the task.
+
+After this release is merged, update the existing plugin and start a new chat. Verify that both plugin skills are available before retiring any personal standalone `bto-talent-pool` skill created during setup. The updater already refreshes the entire plugin; no additional hook or second installation is needed.
+
 Version 3.1 uses one native Word template derived exclusively from D.P. The original D.P. banner, square list markers, first-job indentation, later-job alignment and paragraph spacing are retained. There is no layout switch. The original candidate files are not distributed.
 
 ## Start here
