@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "bto-cv",
-  "version": "3.2.5",
+  "version": "3.2.6",
   "description": "Convert original CVs into editable BTO Word documents using the shared R.R./A.F.R. layout and its native square bullet lists.",
   "author": {
     "name": "Keyan FEILI"

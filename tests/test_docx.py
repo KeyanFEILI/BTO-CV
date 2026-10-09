@@ -8,50 +8,76 @@ spec=importlib.util.spec_from_file_location('builder',SKILL/'scripts/build_docx.
 builder=importlib.util.module_from_spec(spec);spec.loader.exec_module(builder)
 W=builder.W
 class NativeWordTests(unittest.TestCase):
- def test_language_display_mapping_and_retention(self):
-  for source,expected in [('Native','Native'),('mother tongue','Native'),('Fluent','Fluent'),('C1','Fluent'),('C2','Fluent'),('B2','Full Professional'),('Basic','Professional'),('A1','Professional'),('A2','Professional'),('B1','Professional')]:
+ def test_language_display_mapping_and_threshold(self):
+  for source,expected in [('Native','Native'),('native speaker','Native'),('mother tongue','Native'),('Fluent','Fluent'),('C1','Fluent'),('C2','Fluent'),('B2','Professional'),('professional working proficiency','Professional'),('full professional proficiency','Professional'),('Professional','Professional')]:
    for entry in ['French - '+source,'French ('+source+')','French: '+source.lower()]:
     with self.subTest(entry=entry):self.assertEqual(builder.language_label(entry),'French ('+expected+')')
-  data={'initials':'T.E.','languages':['French (Native)','English - C2','Spanish - A1','German - B1','Italian - B2','Japanese','Dutch - Intermediate','Portuguese - C2 (Business certified)','French - B1 (DELF certified)']}
-  expected=['French (Native)','English (Fluent)','Spanish (Professional)','German (Professional)','Italian (Full Professional)','Japanese','Dutch (Intermediate)','Portuguese (Fluent)','French (Professional)']
-  self.assertEqual(builder.normalize(data)['languages'],expected)
-  self.assertEqual(builder.language_label('French (CEFR B1)'),'French (Professional)')
-  self.assertEqual(builder.language_label('English (Fluent / C2)'),'English (Fluent)')
-  self.assertEqual(builder.normalize(dict(data,languages=expected))['languages'],expected)
-  with tempfile.TemporaryDirectory() as tmp:
-   output=Path(tmp)/'cv.docx';builder.build(data,output)
-   with zipfile.ZipFile(output) as z:doc=minidom.parseString(z.read('word/document.xml'))
-   paras=doc.getElementsByTagNameNS(W,'p')
-   self.assertEqual([builder.text(p) for p in paras if p.getElementsByTagNameNS(W,'numPr')],['Portuguese - Business certified','French - DELF certified']+expected)
- def test_language_exams_move_to_certifications_without_losing_details(self):
+  for level in ['B1','A1','A2','intermediate','basic','beginner','elementary','limited proficiency']:
+   with self.subTest(level=level):self.assertIsNone(builder.language_label('French ('+level+')'))
+  self.assertEqual(builder.language_label('English (C1/C2)'),'English (Fluent)')
+  self.assertEqual(builder.language_label('Deutsch (B2)'),'German (Professional)')
+  self.assertEqual(builder.language_label('Français (mother tongue)'),'French (Native)')
+
+ def test_omitted_languages_are_flagged_without_appearing_in_docx(self):
+  values=['Japanese','French (advanced)','English (Fluent / Native)','German B1/B2','English - C1 (business use)','French (B1 (DELF))','English (IELTS 7.5, planned)','French (near native)','French (native-level)','Unknown (C1)']
+  for value in values:
+   with self.subTest(value=value):
+    normalized=builder.normalize({'initials':'T.E.','education':['Degree'],'languages':[value]})
+    self.assertEqual(normalized['languages'],[])
+    self.assertTrue(normalized['language_review'])
+    self.assertEqual(builder.normalize(normalized),normalized)
+    with tempfile.TemporaryDirectory() as tmp:
+     output=Path(tmp)/'cv.docx';builder.build(normalized,output)
+     with zipfile.ZipFile(output) as z:content=builder.text(minidom.parseString(z.read('word/document.xml')))
+     self.assertNotIn('LANGUAGES',content);self.assertNotIn(value,content)
+
+ def test_language_exams_are_preserved_without_inferred_proficiency(self):
   data={'initials':'T.E.','certifications':['French - DELF B1 certified, 2022'],
         'languages':['French (B1) (DELF B1 certified, 2022)','English: proficient (C1)','Spanish (B2 CEFR)',
                      'German - B2 (Goethe-Zertifikat B2, 2023)','English (C1, IELTS 8.0, 2024)',
                      'Japanese (JLPT N2, 2021)','Italian IELTS 6.5']}
   normalized=builder.normalize(data)
-  self.assertEqual(normalized['languages'],['French (Professional)','English (Fluent)','Spanish (Full Professional)',
-                   'German (Full Professional)','English (Fluent)','Japanese','Italian'])
+  self.assertEqual(normalized['languages'],['English (Fluent)','Spanish (Professional)','German (Professional)'])
   self.assertEqual(normalized['certifications'],['French - DELF B1 certified, 2022','German - Goethe-Zertifikat B2, 2023',
                    'English - IELTS 8.0, 2024','Japanese - JLPT N2, 2021','Italian - IELTS 6.5'])
   self.assertEqual(builder.normalize(normalized),normalized)
   self.assertEqual(data['certifications'],['French - DELF B1 certified, 2022'])
+  self.assertEqual(builder.language_parts('English - C1; IELTS (8.0, 2024)'),('English (Fluent)',['English - IELTS (8.0, 2024)']))
+  self.assertEqual(builder.language_parts('English (IELTS 7.5, planned)'),(None,['English - IELTS 7.5, planned']))
   with tempfile.TemporaryDirectory() as tmp:
    output=Path(tmp)/'cv.docx';builder.build(data,output)
    with zipfile.ZipFile(output) as z:doc=minidom.parseString(z.read('word/document.xml'))
    content=[builder.text(p) for p in builder.children(doc.getElementsByTagNameNS(W,'body')[0],'p') if builder.text(p)]
    self.assertEqual(content,['T.E.','CERTIFICATIONS AND TRAINING']+normalized['certifications']+['LANGUAGES']+normalized['languages'])
- def test_language_ranges_do_not_guess_or_leak_cefr(self):
-  self.assertEqual(builder.language_label('English (C1/C2)'),'English (Fluent)')
-  self.assertEqual(builder.language_label('French (A1 / A2 / B1)'),'French (Professional)')
-  self.assertEqual(builder.language_label('French-B1'),'French (Professional)')
-  self.assertEqual(builder.language_parts('English - C1; IELTS (8.0, 2024)'),('English (Fluent)',['English - IELTS (8.0, 2024)']))
-  self.assertEqual(builder.language_parts('English (IELTS 7.5, planned)'),('English',['English - IELTS 7.5, planned']))
-  for value in ['German B1/B2','English (Fluent / Native)','English - C1 (business use)', 'French (B1 (DELF))']:
-   with self.subTest(value=value),self.assertRaises(ValueError):builder.normalize({'initials':'T.E.','languages':[value]})
+
+ def test_conflicting_entries_and_duplicate_languages(self):
+  data={'initials':'T.E.','education':['Degree'],'languages':['English (Native)','English (Fluent)','French (B2)','French (Professional)']}
+  normalized=builder.normalize(data)
+  self.assertEqual(normalized['languages'],['French (Professional)'])
+  self.assertTrue(any('conflicting' in note for note in normalized['language_review']))
+  for omitted in ['English (B1)','English (basic)','English (advanced)','English']:
+   with self.subTest(omitted=omitted):
+    normalized=builder.normalize({'initials':'T.E.','education':['Degree'],'languages':['English (C1)',omitted]})
+    self.assertEqual(normalized['languages'],[])
+    self.assertTrue(any('across entries' in note for note in normalized['language_review']))
+
+ def test_cli_flags_omissions_outside_the_cv(self):
+  import subprocess,sys
+  with tempfile.TemporaryDirectory() as tmp:
+   source=Path(tmp)/'input.json';output=Path(tmp)/'cv.docx'
+   source.write_text(json.dumps({'initials':'T.E.','education':['Degree'],'languages':['English (B2)','French (advanced)','German (B1)','Japanese']}))
+   run=subprocess.run([sys.executable,str(SKILL/'scripts/build_docx.py'),str(source),str(output)],capture_output=True,text=True)
+   self.assertEqual(run.returncode,0,run.stderr)
+   for value in ['French (advanced)','German (B1)','Japanese']:self.assertIn(value,run.stderr)
+   with zipfile.ZipFile(output) as z:content=builder.text(minidom.parseString(z.read('word/document.xml')))
+   self.assertIn('English (Professional)',content)
+   self.assertNotIn('Language review',content)
+   for value in ['French','German','Japanese']:self.assertNotIn(value,content)
+
  def test_exact_blank_lines_for_jobs_and_optional_sections(self):
   for mask in range(32):
    data={'initials':'T.E.'}
-   sections=[('experience',[{'dates':'2025','role':'First','bullets':['A']},{'employer':'Second','bullets':[]},{'bullets':['B']}]),('education',['Degree']),('skills',[{'category':'Tools','bullets':['SQL']}]),('certifications',['Certificate']),('languages',['English'])]
+   sections=[('experience',[{'dates':'2025','role':'First','bullets':['A']},{'employer':'Second','bullets':[]},{'bullets':['B']}]),('education',['Degree']),('skills',[{'category':'Tools','bullets':['SQL']}]),('certifications',['Certificate']),('languages',['English (Fluent)'])]
    expected=['T.E.',''];populated=False
    for i,(key,value) in enumerate(sections):
     if not mask & (1<<i):continue
@@ -91,7 +117,7 @@ class NativeWordTests(unittest.TestCase):
     self.assertIn('Product Owner',content);self.assertNotIn('{{',content)
 
  def test_incompatible_external_master_can_recover_with_installed_pair(self):
-  data={'initials':'A.E.','languages':['English']}
+  data={'initials':'A.E.','languages':['English (Fluent)']}
   with tempfile.TemporaryDirectory() as tmp:
    template=Path(tmp)/'external.docx';output=Path(tmp)/'cv.docx'
    with zipfile.ZipFile(SKILL/'assets/BTO_CV_Template.docx') as src,zipfile.ZipFile(template,'w') as dst:
@@ -126,12 +152,12 @@ class NativeWordTests(unittest.TestCase):
 
  def test_long_content_and_missing_dates_preserved(self):
   bullets=[('Responsibility '+str(i)+' '+('long editable text ' * 20)).strip() for i in range(80)]
-  data={'initials':'T.E.','experience':[{'dates':'2025','role':'One','bullets':bullets},{'role':'Two','bullets':['Final']},{'bullets':['Undated role']}],'languages':['English']}
+  data={'initials':'T.E.','experience':[{'dates':'2025','role':'One','bullets':bullets},{'role':'Two','bullets':['Final']},{'bullets':['Undated role']}],'languages':['English (Fluent)']}
   with tempfile.TemporaryDirectory() as tmp:
    output=Path(tmp)/'cv.docx';builder.build(data,output)
    with zipfile.ZipFile(output) as z:doc=minidom.parseString(z.read('word/document.xml'))
    paras=builder.children(doc.getElementsByTagNameNS(W,'body')[0],'p')
-   self.assertEqual([builder.text(p) for p in paras if p.getElementsByTagNameNS(W,'numPr')],bullets+['Final','Undated role','English'])
+   self.assertEqual([builder.text(p) for p in paras if p.getElementsByTagNameNS(W,'numPr')],bullets+['Final','Undated role','English (Fluent)'])
    for label in ['Two','Main responsibilities:']:
     if label=='Two':p=next(p for p in paras if builder.text(p)==label)
     else:p=[p for p in paras if builder.text(p)==label][-1]
@@ -143,7 +169,7 @@ class NativeWordTests(unittest.TestCase):
   for value in ['\u25aa item','\u2022 item','- item','* item','bad\ud800','bad\uffff']:
    with self.subTest(value=repr(value)),self.assertRaises(ValueError):
     builder.normalize({'initials':'A.E.','languages':[value]})
-  self.assertEqual(builder.normalize({'initials':'A.E.','languages':['C++; C#; *SQL*']})['languages'],['C++; C#; *SQL*'])
+  self.assertEqual(builder.normalize({'initials':'A.E.','skills':[{'category':'Tools','bullets':['C++; C#; *SQL*']}]})['skills'][0]['bullets'],['C++; C#; *SQL*'])
 
  def test_reject_broken_native_lists_before_writing(self):
   with tempfile.TemporaryDirectory() as tmp:
@@ -166,17 +192,17 @@ class NativeWordTests(unittest.TestCase):
         content=doc.toxml(encoding='UTF-8')
        dst.writestr(name,content)
      with self.assertRaisesRegex(ValueError,'Template native square list invalid'):
-      builder.build({'initials':'A.E.','languages':['English']},output,template)
+      builder.build({'initials':'A.E.','languages':['English (Fluent)']},output,template)
      self.assertFalse(output.exists())
 
  def test_content_fidelity_and_pagination_properties(self):
-  data={'initials':'A.E.','experience':[{'dates':'2025','role':'D\u00e9veloppeur & analyst','bullets':['Built <tools>\nUsed SQL']},{'employer':'Client','bullets':[]}], 'education':['Degree 2022'], 'skills':[{'category':'Tools','bullets':['C++; SQL']}], 'languages':['French']}
+  data={'initials':'A.E.','experience':[{'dates':'2025','role':'D\u00e9veloppeur & analyst','bullets':['Built <tools>\nUsed SQL']},{'employer':'Client','bullets':[]}], 'education':['Degree 2022'], 'skills':[{'category':'Tools','bullets':['C++; SQL']}], 'languages':['French (Native)']}
   with tempfile.TemporaryDirectory() as tmp:
    output=Path(tmp)/'cv.docx';builder.build(data,output)
    with zipfile.ZipFile(output) as z:doc=minidom.parseString(z.read('word/document.xml'))
    paras=builder.children(doc.getElementsByTagNameNS(W,'body')[0],'p')
    actual=[builder.text(p) for p in paras if builder.text(p)]
-   self.assertEqual(actual,['A.E.','WORK EXPERIENCE','2025','D\u00e9veloppeur & analyst','Main responsibilities:','Built <tools>Used SQL','Client','EDUCATION','Degree 2022','IT SKILLS','Tools','C++; SQL','LANGUAGES','French'])
+   self.assertEqual(actual,['A.E.','WORK EXPERIENCE','2025','D\u00e9veloppeur & analyst','Main responsibilities:','Built <tools>Used SQL','Client','EDUCATION','Degree 2022','IT SKILLS','Tools','C++; SQL','LANGUAGES','French (Native)'])
    with zipfile.ZipFile(SKILL/'assets/BTO_CV_Template.docx') as z:base=minidom.parseString(z.read('word/document.xml'))
    prototypes={builder.text(p):p for p in builder.children(base.getElementsByTagNameNS(W,'body')[0],'p')}
    for p in paras:
@@ -213,7 +239,7 @@ class NativeWordTests(unittest.TestCase):
       self.assertEqual(level.getElementsByTagNameNS(W,'lvlText')[0].getAttribute('w:val'),'\uf0a7')
       self.assertEqual(level.getElementsByTagNameNS(W,'rFonts')[0].getAttribute('w:ascii'),'Wingdings')
  def test_rr_afr_alignment_and_spacing(self):
-  data={'initials':'A.E.','experience':[{'dates':'2025','role':'First role','employer':'One','bullets':['First','Last']},{'dates':'2024','role':'Second role','employer':'Two','bullets':['Next']}],'languages':['English']}
+  data={'initials':'A.E.','experience':[{'dates':'2025','role':'First role','employer':'One','bullets':['First','Last']},{'dates':'2024','role':'Second role','employer':'Two','bullets':['Next']}],'languages':['English (Fluent)']}
   with tempfile.TemporaryDirectory() as tmp:
    output=Path(tmp)/'cv.docx';builder.build(data,output)
    with zipfile.ZipFile(output) as z:doc=minidom.parseString(z.read('word/document.xml'))
@@ -238,14 +264,14 @@ class NativeWordTests(unittest.TestCase):
    with zipfile.ZipFile(SKILL/'assets/BTO_CV_Template.docx') as src,zipfile.ZipFile(template,'w') as dst:
     for name in src.namelist():dst.writestr(name,src.read(name).replace(b'{{layout_rr_afr_v2}}',b'{{legacy_layout}}') if name=='word/document.xml' else src.read(name))
    with self.assertRaisesRegex(ValueError,'Template slot missing'):
-    builder.build({'initials':'A.E.','languages':['English']},Path(tmp)/'cv.docx',template)
+    builder.build({'initials':'A.E.','languages':['English (Fluent)']},Path(tmp)/'cv.docx',template)
  def test_missing_sections_and_no_overwrite(self):
   with tempfile.TemporaryDirectory() as tmp:
-   output=Path(tmp)/'cv.docx';builder.build({'initials':'A.E.','languages':['English']},output)
+   output=Path(tmp)/'cv.docx';builder.build({'initials':'A.E.','languages':['English (Fluent)']},output)
    with zipfile.ZipFile(output) as z:
     content=builder.text(minidom.parseString(z.read('word/document.xml')))
     self.assertIn('LANGUAGES',content);self.assertNotIn('WORK EXPERIENCE',content)
-   with self.assertRaises(FileExistsError):builder.build({'initials':'A.E.','languages':['English']},output)
+   with self.assertRaises(FileExistsError):builder.build({'initials':'A.E.','languages':['English (Fluent)']},output)
  def test_reject_unmapped_or_invalid_data(self):
   for data in [{'initials':'A.E.','unknown':'value'},{'initials':'A.E.','languages':'English'},{'initials':'A.E.','languages':['bad\x00text']},{'initials':'A.E.'}]:
    with self.subTest(data=data),self.assertRaises(ValueError):builder.normalize(data)
