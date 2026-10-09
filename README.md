@@ -16,7 +16,9 @@ The workflow checks for an existing candidate, prepares a concise profile and st
 
 CV-only conversion still produces a DOCX without creating Trello cards. An already verified DOCX from the same original in the current task is reused. Candidate CVs and working data stay outside this repository.
 
-The current Trello connector supports card creation and labels but does not expose file uploads or native copying. Completing both attachments or a client copy therefore requires an authenticated browser session with those capabilities. The workflow verifies both attachments and reports incomplete steps if unavailable; it does not claim that card creation alone completes the task.
+The Trello connector creates cards and labels. The bundled local Windows uploader sends both CVs directly to Trello, using Python's standard library and Windows Credential Manager, with no paid automation service or extra file host. See [one-time authorization and setup](skills/trello/references/uploader-setup.md). The uploader accepts only an open card on the private BTO LUX Talent Pool board, checks for matching uploads before retrying, and verifies both attachment records. Keep candidate files outside this repository.
+
+This requires a separate one-time Trello API key/token authorization; the helper cannot reuse the connector's credentials. Enter secrets only in the local masked setup window. Offline tests pass, but Windows credential persistence and a live fictional-CV upload must be verified after setup. Client copies can use an authenticated browser, or connector-created copies with the same local files attached by the uploader.
 
 After this release is merged, update the existing plugin and start a new chat. Verify that both `bto-cv` and `trello` skills are available before retiring any personal standalone `bto-talent-pool` skill created during setup. The updater already refreshes the entire plugin; no additional hook or second installation is needed.
 
