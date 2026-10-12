@@ -22,7 +22,13 @@ def extract(source):
             doc=minidom.parseString(package.read('word/document.xml'))
         paragraphs=[]
         for p in doc.getElementsByTagNameNS(W,'p'):
-            content=''.join(t.firstChild.data if t.firstChild else '' for t in p.getElementsByTagNameNS(W,'t'))
+            fragments=[]
+            for node in p.getElementsByTagName('*'):
+                if node.namespaceURI!=W:continue
+                if node.localName=='t':fragments.extend(c.data for c in node.childNodes if c.nodeType==c.TEXT_NODE)
+                elif node.localName in {'br','cr'}:fragments.append('\n')
+                elif node.localName=='tab':fragments.append('\t')
+            content=''.join(fragments)
             if content.strip():paragraphs.append(content)
         return '\n'.join(paragraphs)
     if suffix=='.pdf':

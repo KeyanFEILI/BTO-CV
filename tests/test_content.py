@@ -22,11 +22,11 @@ extractor=load('extract_text')
 
 class ContentTests(unittest.TestCase):
     def test_utf8_extraction_retains_docx_paragraphs_and_tables(self):
-        xml='<w:document xmlns:w="'+builder.W+'"><w:body><w:p><w:r><w:t>Example résumé</w:t></w:r></w:p><w:tbl><w:tr><w:tc><w:p><w:r><w:t>Client A &amp; B</w:t></w:r></w:p></w:tc></w:tr></w:tbl></w:body></w:document>'
+        xml='<w:document xmlns:w="'+builder.W+'"><w:body><w:p><w:r><w:t>Example résumé</w:t><w:br/><w:t>Java</w:t><w:tab/><w:t>SQL</w:t></w:r></w:p><w:tbl><w:tr><w:tc><w:p><w:r><w:t>Client A &amp; B</w:t></w:r></w:p></w:tc></w:tr></w:tbl></w:body></w:document>'
         with tempfile.TemporaryDirectory() as tmp:
             source=Path(tmp)/'source.docx'
             with zipfile.ZipFile(source,'w') as z:z.writestr('word/document.xml',xml.encode('utf-8'))
-            self.assertEqual(extractor.extract(source),'Example résumé\nClient A & B')
+            self.assertEqual(extractor.extract(source),'Example résumé\nJava\tSQL\nClient A & B')
             textfile=Path(tmp)/'source.txt';textfile.write_text('Example résumé',encoding='utf-8-sig')
             self.assertEqual(extractor.extract(textfile),'Example résumé')
 
