@@ -20,7 +20,7 @@
     }
   ],
   "education": [
-    "BSc Computer Science, Example University | 2022"
+    "BSc Computer Science, Example University, Example City | 2022"
   ],
   "skills": [
     {
@@ -37,10 +37,10 @@
     }
   ],
   "certifications": [
-    "Product Fundamentals - Example Academy | 2024"
+    "Product Fundamentals, Example Academy, Example City | 2024"
   ],
   "languages": [
     "English (Fluent)",
-    "French (Intermediate)"
+    "French (Professional)"
   ]
 }

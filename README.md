@@ -1,82 +1,63 @@
 # BTO CV
 
-Give the plugin an original PDF or Word CV and receive an editable **BTO .docx**, with the original banner, Century Gothic typography, measured spacing and real square bullet lists.
+Convert an original PDF or Word CV into an editable BTO Word document in English, using the bundled R.R./A.F.R. master, Century Gothic typography and native square bullet lists.
 
-Version 3.1 uses one native Word template derived exclusively from D.P. The original D.P. banner, square list markers, first-job indentation, later-job alignment and paragraph spacing are retained. There is no layout switch. The original candidate files are not distributed.
+Version **3.3.0** retains the Word layout and adds enforced content formatting. Wording stays unchanged unless translation or necessary cleanup is required. Candidate facts and documents are never repository fixtures.
 
-## Start here
+## Install and update
 
-Accept the owner's GitHub invitation to this private repository first. You need a local Codex environment that supports plugins and authenticated Git access; installing the ordinary ChatGPT desktop app alone is not enough.
+Use a local Codex environment with plugin support, Python 3 and Git. The repository's current access settings determine whether a GitHub invitation is necessary; an install link does not grant repository access.
 
 Copy this message into a local Codex chat:
 
-> Install BTO CV from https://github.com/KeyanFEILI/BTO-CV.git. First check whether bto-cv@bto-cv-marketplace is already installed. If not, register the marketplace using `codex plugin marketplace add https://github.com/KeyanFEILI/BTO-CV.git --ref main`, then run `codex plugin add bto-cv@bto-cv-marketplace`. Stop and explain if repository access or the required commands are unavailable. Verify that the plugin is installed and enabled. If a standalone bto-cv skill exists, preserve it until the plugin is verified, then help me retire that duplicate. Do not ask me to paste passwords or tokens. Tell me when to start a new chat.
+> Install BTO CV from https://github.com/KeyanFEILI/BTO-CV.git. Check whether bto-cv@bto-cv-marketplace is already installed. If not, register the marketplace with `codex plugin marketplace add https://github.com/KeyanFEILI/BTO-CV.git --ref main`, then run `codex plugin add bto-cv@bto-cv-marketplace`. Verify that it is installed and enabled, preserve any standalone skill until the plugin is verified, and tell me when to start a new chat. Do not ask for passwords or tokens.
 
-Once installed, start a new chat, select **BTO CV** from the plugin menu, attach your CV, and ask:
+After installation, start a new chat and select **BTO CV**, attach the original CV and ask for a BTO Word conversion. [Install BTO CV](codex://plugins/install/bto-cv?marketplace=bto-cv-marketplace) opens the install screen after marketplace registration where supported.
 
-> Convert this original CV into an editable BTO Word document using the latest template.
+To update:
 
-**Only need the install screen?** After marketplace registration, use [Install BTO CV](codex://plugins/install/bto-cv?marketplace=bto-cv-marketplace), or open Plugins Ã¢â€ â€™ BTO CV Marketplace Ã¢â€ â€™ BTO CV. Some browsers do not open app links; use the plugin menu instead.
+> Update bto-cv@bto-cv-marketplace from its registered source. Run `codex plugin marketplace upgrade bto-cv-marketplace`, inspect the installed version, and use the supported plugin update or reinstall flow if needed. Verify the result without creating a second copy and tell me when to start a new chat.
 
-## Test it without personal data
+Conversion uses the template and generator from the **same installed release**. It does not fetch a template from GitHub or need network access. A failed update check does not prevent conversion with the verified installed pair. Start a new chat after an update; an existing chat does not hot-reload instructions.
 
-Use [the fictional sample CV](examples/sample-cv.txt). Check that all supplied facts are preserved, no qualifications are invented, and the response identifies the template revision. Open the DOCX in Word, edit the initials, and press Enter at the end of a bullet: Word should create another list item. Check the banner and page breaks in Print Layout.
+## Conversion contract
 
-The owner can then push a small template change. Generate a new CV and check that it uses the new revision. A colleague's separate account still needs this pilot test.
+- English unless another language is requested. Faithful translation; no stylistic rewrite of clear source text, stronger verbs or invented technical scope.
+- Experience dates use `MM/YYYY` when months exist; year-only dates stay years. No invented days or months.
+- Education and certifications put dates last: `Qualification or school, supplied location | dates`. Missing degree titles remain missing; user-approved education wording is preserved.
+- IT skills have at most four coherent groups without losing tools or methods.
+- Languages use Native, Fluent or Professional according to the BTO display convention. All languages remain, and exam names, scores, status and dates move to certifications.
+- Responsibilities retain distinct projects, combine only related fragments, and avoid redundant "Objective" labels and duplicate bullets.
 
-## Updates
+The complete content contract is in [content.md](skills/bto-cv/references/content.md); the measured layout is in [format.md](skills/bto-cv/references/format.md). The agent extracts and reconciles source content once, prepares private UTF-8 JSON, validates it, builds the document, verifies it and inspects its rendered pages. JSON is an internal step, not a user requirement.
 
-| Change | What happens |
-| --- | --- |
-| Owner edits and pushes the Word master | The next generation retrieves it from GitHub, subject to working access. |
-| Owner updates plugin or skill instructions | The trusted session hook checks daily at startup/resume and installs a changed version; start a new chat after an update. |
-| A CV was already generated | That file remains unchanged. |
+## Verification and maintenance
 
-To request a package update, paste this into local Codex:
+Run these from the repository with Python 3:
 
-> Update bto-cv@bto-cv-marketplace from its registered GitHub source. Run `codex plugin marketplace upgrade bto-cv-marketplace`, inspect the installed version, and use the supported plugin update or reinstall flow if needed. Verify the resulting version without creating a second copy. Tell me when to start a new chat.
+```sh
+python -m unittest discover -s tests -v
+python skills/bto-cv/scripts/build_docx.py skills/bto-cv/references/input-example.json --check
+```
 
-If template retrieval fails, the skill asks before using its bundled fallback. Refreshing a marketplace alone does not guarantee that an installed plugin or an active chat has reloaded its instructions.
+The agent can validate a candidate draft without writing another Word file, then build and verify the final artifact:
 
-## Troubleshooting
+```sh
+python skills/bto-cv/scripts/build_docx.py candidate.json --check
+python skills/bto-cv/scripts/build_docx.py candidate.json BTO_CV_A.E.docx
+python skills/bto-cv/scripts/verify_docx.py candidate.json BTO_CV_A.E.docx
+```
 
-| Problem | Next step |
-| --- | --- |
-| Repository unavailable or 404 | Accept the GitHub invitation and check the signed-in GitHub account. |
-| Codex/plugin commands unavailable | Use a supported local Codex environment; this is not a public ChatGPT directory listing. |
-| Plugin not visible after installation | Start a new chat; restart the desktop app if necessary. |
-| Two BTO CV skills appear | Keep the verified plugin and retire the old standalone installation. |
-| Output looks different on another computer | Check Century Gothic and Tw Cen MT font availability and use Microsoft Word Print Layout. |
+Tests run in GitHub Actions on Windows and Linux. Checks cover date normalization, source precision, qualification date placement, language/exam retention, category limits, duplicate labels, editable content, native numbering, unchanged design parts and overwrite protection. They cannot prove that a translation faithfully represents an unseen CV. Source reconciliation and inspection of every rendered page are separate required checks. Prefer Word PDF export on Windows when available; use a supported renderer elsewhere. If rendering is unavailable, disclose that limitation.
 
-## For the maintainer
+The Word master is `skills/bto-cv/assets/BTO_CV_Template.docx`, paired with `skills/bto-cv/scripts/build_docx.py`. Only `word/document.xml` changes in generated documents. The anonymized master banner, styles, numbering and page settings remain intact. Do not force page counts or shrink fonts. Rendered pagination depends on content, fonts and software.
 
-- Master template: `skills/bto-cv/assets/BTO_CV_Template.docx`.
-- Workflow instructions: `skills/bto-cv/SKILL.md`.
-- Plugin version and presentation: `plugin.json`.
-- Marketplace catalog: `.agents/plugins/marketplace.json`.
+For releases, bump `plugin.json`, keep instructions, examples and tests consistent, and run the full suite. Never commit candidate originals, approved candidate CVs, extracted text or reconciliation data. Use fictional examples such as [sample-cv.txt](examples/sample-cv.txt). Setup PDFs in `docs/` predate the current content contract; use this README and the installed skill for current conversion rules.
 
-Edit the master in this repository, review it, commit, and push. Increment the plugin version for package releases. Keep candidate files and generated CVs outside this repository. The installed template is a fallback snapshot, not a second master.
+## Automatic updater
 
-This private marketplace requires initial GitHub access and marketplace registration. A repository or install link cannot grant either automatically.
+The BTO-only SessionStart hook checks the registered marketplace at startup/resume at most once per day, retries failures after an hour, respects disabled installations and prevents overlapping checks. Review and trust it through the supported hook-review interface. Installation alone does not trust it. The hook never reads candidate documents.
 
-## Exact formatting and conversion
+Python 3, Git and a plugin-capable Codex CLI must be available. `BTO_CODEX_BIN` supports an explicit CLI path. Git access must work non-interactively; credentials are never requested or printed by the hook. To diagnose, run the installed `hooks/update.py --force --check`. `current` or `updated` confirms success; `failed` needs attention. A changed hook definition may require renewed review. New chats are required after package updates.
 
-The generator clones native Word paragraph prototypes and preserves the embedded banner, numbering, styles and page settings. It does not convert HTML to Word. IT skills, education, certificates and languages use native bullets as well as job responsibilities. Body content remains editable. Different candidate lengths naturally change pagination; fonts and rendering software can also affect page breaks. D.P. is the only formatting authority, documented in `skills/bto-cv/references/format.md`.
-
-The agent extracts candidate information into temporary JSON and runs the bundled Python 3 generator. Users only provide their original CV; they do not need to prepare JSON. Optional HTML is a secondary preview and cannot override the Word master.
-
-Developer check: `python -m unittest discover -s tests` verifies package preservation, native numbering, text escaping, optional sections and overwrite protection. The corrected fictional result and the D.P. reference-content replay are validated with Microsoft Word. Keep these candidate-content QA files local.
-
-For layout updates, retain the placeholder tokens in the DOCX master. For code or rule changes, bump the plugin version and update the installed plugin.
-
-## Automatic updater setup (3.1.0)
-
-Use local Codex desktop sessions. Python 3 must be available as `python` on Windows (`python3` on macOS/Linux); Git and a plugin-capable Codex CLI must be accessible to the hook. An explicit `BTO_CODEX_BIN` path is supported when Codex is not on PATH. Configure GitHub credentials for non-interactive Git access. GitHub CLI is optional if another credential helper already works.
-
-Review and trust the BTO hook using `/hooks` in Codex CLI (or the desktop hook-review control if available). Installation alone does not trust it. No trust bypass is required. The hook checks at startup/resume, not simply when an app window opens. It is silent when current, checks at most once per 24 hours, and retries a failed check at a later session start after one hour. It updates only this marketplace/plugin, respects disabled installations, uses a lock against overlapping checks, and stores only check time/version/status in PLUGIN_DATA.
-
-For an immediate diagnostic, run the installed `hooks/update.py --force --check` with Python. A result of `current` or `updated` confirms success; `failed` needs attention. Reopen a local session to verify the trusted hook actually fires. A changed hook definition can require renewed trust. New chats are required after package updates; old chats do not hot-reload instructions.
-
-Maintainer: Keyan FEILI. Ask Keyan for changes to the shared plugin. You may edit your generated CVs. Private personal-repository collaborators have write access; this convention is not an access-control mechanism.
-
-See `docs/BTO_CV_Team_Setup.pdf` and `docs/BTO_CV_Owner_Checklist.pdf`. Owner verification includes unit tests and a live GitHub update check; a separate-account pilot and each colleague's hook-trust step remain required.
+Maintainer: Keyan FEILI. Colleagues may generate and edit their own CVs; shared package changes are coordinated with Keyan. This convention is not an access-control mechanism.
