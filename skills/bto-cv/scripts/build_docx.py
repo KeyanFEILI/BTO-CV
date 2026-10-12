@@ -32,10 +32,15 @@ def strings(value, label):
             raise ValueError(label + ' must contain content only, without a typed bullet prefix')
     return result
 
-LANGUAGE_LEVELS={'native':'Native','mother tongue':'Native','fluent':'Fluent','c1':'Fluent','c2':'Fluent',
-                'b2':'Full Professional','basic':'Professional','a1':'Professional','a2':'Professional',
-                'b1':'Professional','professional':'Professional','full professional':'Full Professional'}
-LEVEL_PATTERN=r'\b(?:mother tongue|full professional|professional|native|fluent|basic|[ABC][12])\b'
+LANGUAGE_LEVELS={
+    'native':'Native','mother tongue':'Native','bilingual':'Native','bilingue':'Native',
+    'langue maternelle':'Native','fluent':'Fluent','courant':'Fluent','usage courant':'Fluent',
+    'c1':'Fluent','c2':'Fluent','b2':'Professional','basic':'Professional',
+    'a1':'Professional','a2':'Professional','b1':'Professional','professional':'Professional',
+    'full professional':'Professional','intermediate':'Professional','notions':'Professional',
+    'bonnes notions':'Professional','très bonnes notions':'Professional',
+}
+LEVEL_PATTERN=r'\b(?:'+ '|'.join(re.escape(k) for k in sorted(LANGUAGE_LEVELS,key=len,reverse=True))+r')\b'
 EXAM_PATTERN=r'\b(?:IELTS|TOEFL|TOEIC|DELF|DALF|DILF|TCF|TEF|Cambridge|Goethe|TestDaF|telc|DELE|SIELE|CELI|CILS|HSK|JLPT|OET|PTE|Duolingo|Linguaskill|FCE|CAE|CPE|BULATS|certificat\w*|certified|exam\w*|test|diploma|score)\b'
 
 def language_parts(value):
@@ -70,26 +75,124 @@ def language_parts(value):
                 certifications[-1]+=' ('+chunk+')'
             else:proficiency.append(chunk)
     mapped=[];unknown=[]
+    has_level=any(re.search(LEVEL_PATTERN,part,re.I) for part in proficiency)
     for part in proficiency:
         matches=list(re.finditer(LEVEL_PATTERN,part,re.I))
         mapped.extend(LANGUAGE_LEVELS[m.group().lower()] for m in matches)
         residue=re.sub(LEVEL_PATTERN,'',part,flags=re.I)
-        residue=re.sub(r'\b(?:CEFR|level|proficiency|proficient)\b','',residue,flags=re.I).strip(' /,;:-')
+        # Only remove wrappers around a recognized level. Unknown descriptions
+        # must never be silently shortened (e.g. "Working proficiency" -> "Working").
+        residue=re.sub(r'\b(?:CEFR|level|proficiency|proficient)\b','',residue,flags=re.I).strip(' /,;:-') if has_level else part.strip()
         if residue:unknown.append(residue)
     if len(set(mapped))>1 or (mapped and unknown) or len(unknown)>1:
         raise ValueError('Ambiguous language proficiency; resolve from the original CV: '+value)
-    level=mapped[0] if mapped else unknown[0] if unknown else ''
+    if unknown:
+        raise ValueError('Unmapped language proficiency; supply Native, Fluent or Professional using source evidence or an explicit user instruction: '+value)
+    level=mapped[0] if mapped else ''
     return name+(' ('+level+')' if level else ''),certifications
 
 def language_label(value):
     return language_parts(value)[0]
 
-def validate_lists(prototypes, parts):
+MONTHS={}
+for number,names in enumerate([
+    'january janvier jan', 'february février fevrier feb', 'march mars mar',
+    'april avril apr', 'may mai', 'june juin jun', 'july juillet jul',
+    'august août aout aug', 'september septembre sep sept',
+    'october octobre oct', 'november novembre nov', 'december décembre decembre dec',
+],1):
+    MONTHS.update((name,number) for name in names.split())
+
+def date_parts(value):
+    """Return known (month, year); do not manufacture missing precision."""
+    value=value.strip().rstrip('.').casefold()
+    if value in {'present','current','ongoing','now','présent','actuel','à ce jour',"aujourd'hui",'en cours'}:
+        return 'Present'
+    match=re.fullmatch(r'(?:(\d{1,2})/)?(\d{4})',value)
+    if match:
+        month=int(match[1]) if match[1] else None
+        year=int(match[2])
+    else:
+        match=re.fullmatch(r'(\d{1,2})/(\d{1,2})/(\d{4})',value)
+        if match:
+            from datetime import date
+            try:date(int(match[3]),int(match[2]),int(match[1]))
+            except ValueError:raise ValueError('Invalid calendar date: '+value) from None
+            month,year=int(match[2]),int(match[3])
+        else:
+            match=re.fullmatch(r'([^\d]+?)(?:\s+(\d{4}))?',value)
+            if not match or match[1].strip().rstrip('.') not in MONTHS:
+                raise ValueError('Unrecognized date; use MM/YYYY or preserve supplied years: '+value)
+            month=MONTHS[match[1].strip().rstrip('.')]
+            year=int(match[2]) if match[2] else None
+    if month is not None and not 1<=month<=12:raise ValueError('Invalid month: '+value)
+    if year is not None and not 1<=year<=9999:raise ValueError('Invalid year: '+value)
+    return month,year
+
+def date_label(value):
+    if not value.strip():return ''
+    value=re.sub(r'^(?:from\s+|de\s+|d[’\x27])','',value.strip(),flags=re.I).rstrip('.').strip()
+    endpoints=re.split(r'\s*[-–—]\s*|\s+(?:to|à|au)\s+',value,flags=re.I)
+    if len(endpoints)>2:raise ValueError('Unrecognized date range: '+value)
+    parts=[date_parts(v) for v in endpoints]
+    if parts[0]=='Present' and len(parts)>1:raise ValueError('Present cannot start a date range: '+value)
+    # "March - May 2019" explicitly supplies a shared year; no missing month is inferred.
+    if len(parts)==2:
+        for i in range(2):
+            other=parts[1-i]
+            if parts[i]!='Present' and parts[i][1] is None and other!='Present' and other[1] is not None:
+                parts[i]=(parts[i][0],other[1])
+    for part in parts:
+        if part!='Present' and part[1] is None:raise ValueError('Date year missing: '+value)
+    if len(parts)==2 and parts[1]!='Present':
+        start,end=parts
+        if start[1]>end[1] or (start[1]==end[1] and start[0] and end[0] and start[0]>end[0]):
+            raise ValueError('Date range ends before it starts: '+value)
+    return ' - '.join('Present' if p=='Present' else (f'{p[0]:02d}/' if p[0] else '')+str(p[1]) for p in parts)
+
+# Dates are metadata only at an entry boundary. Scores, product/version numbers,
+# dates embedded in a qualification name, and certification status remain intact.
+DATE_TOKEN=r'(?:\d{1,2}/\d{1,2}/\d{4}|\d{1,2}/\d{4}|\d{4})'
+DATE_RANGE=DATE_TOKEN+r'(?:\s*[-–—]\s*(?:'+DATE_TOKEN+r'|Present))?'
+
+def qualification_label(value):
+    """Move explicit boundary dates to the end, preserving names, locations and status."""
+    if '|' in value:
+        content,dates=value.rsplit('|',1)
+        if not content.strip():raise ValueError('Qualification content missing: '+value)
+        if not dates.strip():raise ValueError('Qualification date missing after |: '+value)
+        return content.strip()+' | '+date_label(dates)
+    prefix=re.match(r'^('+DATE_RANGE+r')\s*:\s*(.+)$',value,re.I)
+    if prefix:return prefix[2].strip().rstrip('.')+' | '+date_label(prefix[1])
+    # Only explicit punctuation marks a trailing metadata date. A bare year can
+    # belong to a certificate title such as "Windows Server 2022".
+    suffix=re.search(r'(?:\s*[,;]\s*|\s*\(\s*)('+DATE_RANGE+r')\s*\)?\.?$',value,re.I)
+    if suffix and value[:suffix.start()].strip():
+        content=value[:suffix.start()].strip().rstrip('.')
+        # Preserve enclosing score/status parentheses when the date was inside
+        # them: IELTS (8.0, 2024) -> IELTS (8.0) | 2024.
+        closing=len(re.findall(r'\)',value[suffix.start():]))
+        content+=')'*min(closing,max(0,content.count('(')-content.count(')')))
+        return content+' | '+date_label(suffix[1])
+    # No source date or location? Do not create a date, placeholder, or diploma.
+    return value
+
+def responsibility_list(values):
+    seen=set()
+    for value in values:
+        if re.match(r'^(?:(?:objective|objectif)(?:\s+(?:project|projet)(?:\s+IAM)?(?:\s+\d+)?)?|main responsibilities|activités récurrentes|recurring activities|interest|intérêt)\s*(?::|$)',value,re.I):
+            raise ValueError('Redundant responsibility label; integrate its source content into the relevant responsibility: '+value)
+        key=re.sub(r'\s+',' ',value).casefold().rstrip(' .;')
+        if key in seen:raise ValueError('Duplicate responsibility; consolidate only within the same project or clarify distinct project scope: '+value)
+        seen.add(key)
+    return values
+
+def validate_lists(prototypes, parts, slots=None):
     """Fail before writing if any list slot has lost its native square numbering."""
     numbering=minidom.parseString(parts['word/numbering.xml'])
     nums={n.getAttributeNS(W,'numId'):n for n in children(numbering.documentElement,'num')}
     abstracts={n.getAttributeNS(W,'abstractNumId'):n for n in children(numbering.documentElement,'abstractNum')}
-    for slot in ['experience_bullet','education_bullet','skill_bullet','certification_bullet','language_bullet']:
+    for slot in slots if slots is not None else ['experience_bullet','education_bullet','skill_bullet','certification_bullet','language_bullet']:
         try:
             p=prototypes['{{'+slot+'}}']
             numpr=children(children(p,'pPr')[0],'numPr')[0]
@@ -127,6 +230,10 @@ def normalize(data):
             if certificate.casefold() not in {v.casefold() for v in result['certifications']}:
                 result['certifications'].append(certificate)
     result['languages']=languages
+    result['education']=[qualification_label(v) for v in result['education']]
+    result['certifications']=[qualification_label(v) for v in result['certifications']]
+    # Exam annotations can match existing entries only after date normalization.
+    result['certifications']=list({v.casefold():v for v in reversed(result['certifications'])}.values())[::-1]
     for key,fields in [('experience',{'dates','role','employer','bullets'}),('skills',{'category','bullets'})]:
         items=data.get(key,[])
         if not isinstance(items,list): raise ValueError(key+' must be a list')
@@ -138,8 +245,13 @@ def normalize(data):
                 value=item.get(field,'')
                 if not isinstance(value,str): raise ValueError(field+' must be a string')
                 record[field]=string(value,field) if value.strip() else ''
+            if key=='experience':
+                record['dates']=date_label(record['dates'])
+                record['bullets']=responsibility_list(record['bullets'])
             if not any(record.values()): raise ValueError('Empty '+key+' entry')
             result[key].append(record)
+    if len(result['skills'])>4:
+        raise ValueError('IT SKILLS supports at most four groups; consolidate categories without dropping tools or methods')
     if not any(result[k] for k in allowed-{'initials'}): raise ValueError('No CV content supplied')
     return result
 
@@ -225,11 +337,17 @@ def build(data, output, template=None):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('input',type=Path,help='Normalized UTF-8 candidate JSON')
-    parser.add_argument('output',type=Path,help='New .docx output file')
+    parser.add_argument('output',type=Path,nargs='?',help='New .docx output file')
     parser.add_argument('--template',type=Path,help='Explicit approved DOCX master')
+    parser.add_argument('--check',action='store_true',help='Validate and normalize input without writing a document')
     args=parser.parse_args()
-    try:build(json.loads(args.input.read_text(encoding='utf-8-sig')),args.output,args.template)
+    if not args.check and args.output is None:parser.error('output is required unless --check is used')
+    if args.check and args.output is not None:parser.error('--check does not accept an output path')
+    try:
+        data=json.loads(args.input.read_text(encoding='utf-8-sig'))
+        if args.check:normalize(data)
+        else:build(data,args.output,args.template)
     except (ValueError,KeyError,OSError,zipfile.BadZipFile) as error:parser.exit(1,str(error)+'\n')
-    print('Created '+str(args.output))
+    print('Input checks passed' if args.check else 'Created '+str(args.output))
 
 if __name__=='__main__': main()
