@@ -39,9 +39,11 @@ class UpdateTests(unittest.TestCase):
     def test_current_does_not_reinstall(self):
         self.assertEqual(self.simulate(current='3.1.0'),'current');self.assertEqual(self.output,'')
         self.assertFalse(any(x[:2]==['plugin','add'] for x in self.calls))
+        self.assertEqual(sum(x[:2]==['plugin','list'] for x in self.calls),2)
     def test_refresh_can_update_without_add(self):
         self.assertEqual(self.simulate(refresh_updates=True),'updated')
         self.assertFalse(any(x[:2]==['plugin','add'] for x in self.calls))
+        self.assertEqual(sum(x[:2]==['plugin','list'] for x in self.calls),2)
     def test_failure_retries_after_hour(self):
         self.assertEqual(self.simulate(fail=True),'failed');self.assertEqual(self.version,'3.0.0')
         self.assertEqual(self.invoke(now=100010),'throttled')
