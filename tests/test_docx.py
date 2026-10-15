@@ -218,6 +218,16 @@ class NativeWordTests(unittest.TestCase):
    output=Path(tmp)/'cv.docx';builder.build(data,output)
    with zipfile.ZipFile(output) as z:doc=minidom.parseString(z.read('word/document.xml'))
    paras=doc.getElementsByTagNameNS(W,'p');bytext={builder.text(p):p for p in paras}
+   labels=[p for p in paras if builder.text(p)=='Main responsibilities:']
+   self.assertEqual(len(labels),2)
+   for p in labels:
+    spacing=p.getElementsByTagNameNS(W,'spacing')[0]
+    self.assertEqual(spacing.getAttributeNS(W,'line'),'360')
+    self.assertEqual(spacing.getAttributeNS(W,'lineRule'),'auto')
+    for key in ('before','after'):self.assertIn(spacing.getAttributeNS(W,key),('','0'))
+   for key in ['2025','First role','One','2024','Second role','Two']:
+    self.assertEqual(bytext[key].getElementsByTagNameNS(W,'spacing')[0].getAttributeNS(W,'line'),'240')
+   self.assertEqual(bytext['First'].getElementsByTagNameNS(W,'spacing')[0].getAttributeNS(W,'line'),'228')
    for key in ['2025','First role','One','2024','Second role','Two','WORK EXPERIENCE','LANGUAGES','A.E.']:
     self.assertFalse(bytext[key].getElementsByTagNameNS(W,'ind'),key)
    self.assertFalse(bytext['Last'].getElementsByTagNameNS(W,'br'))

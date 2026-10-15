@@ -2,7 +2,7 @@
 
 Convert an original PDF or Word CV into an editable BTO Word document in English, using the bundled R.R./A.F.R. master, Century Gothic typography and native square bullet lists.
 
-Version **3.3.0** retains the Word layout and adds enforced content formatting. Wording stays unchanged unless translation or necessary cleanup is required. Candidate facts and documents are never repository fixtures.
+Version **3.3.1** adds the approved 1.5-line spacing on each “Main responsibilities:” label while retaining the existing bullet spacing and content rules. Wording stays unchanged unless translation or necessary cleanup is required. Candidate facts and documents are never repository fixtures.
 
 ## Install and update
 

@@ -145,13 +145,18 @@ class ContentTests(unittest.TestCase):
         data={'initials':'T.E.','experience':[{'dates':'05/2024 - Present','bullets':['Monitored access requests.']}]}
         with tempfile.TemporaryDirectory() as tmp:
             original=Path(tmp)/'original.docx';builder.build(data,original)
-            for mutation in ['content','design','numbering']:
+            for mutation in ['content','design','numbering','responsibility_spacing']:
                 altered=Path(tmp)/(mutation+'.docx')
                 with zipfile.ZipFile(original) as src,zipfile.ZipFile(altered,'w') as dst:
                     for name in src.namelist():
                         content=src.read(name)
                         if mutation=='design' and name=='word/styles.xml':content=content.replace(b'Century Gothic',b'Arial')
                         if name=='word/document.xml':
+                            if mutation=='responsibility_spacing':
+                                doc=minidom.parseString(content)
+                                label=next(p for p in doc.getElementsByTagNameNS(builder.W,'p') if builder.text(p)=='Main responsibilities:')
+                                label.getElementsByTagNameNS(builder.W,'spacing')[0].setAttribute('w:line','240')
+                                content=doc.toxml(encoding='UTF-8')
                             if mutation=='content':content=content.replace(b'Monitored access requests.',b'Implemented a new system.')
                             if mutation=='numbering':
                                 doc=minidom.parseString(content)
