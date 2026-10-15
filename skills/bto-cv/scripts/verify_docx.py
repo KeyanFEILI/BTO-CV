@@ -60,6 +60,12 @@ def verify(data,output,template=None):
         raise ValueError('Banner differs from the master')
     lists={}
     for p in paras:
+        if builder.text(p)=='Main responsibilities:':
+            spacing=p.getElementsByTagNameNS(W,'spacing')
+            if (len(spacing)!=1 or spacing[0].getAttributeNS(W,'line')!='360'
+                    or spacing[0].getAttributeNS(W,'lineRule')!='auto'
+                    or any(spacing[0].getAttributeNS(W,key) not in ('','0') for key in ('before','after'))):
+                raise ValueError('Main responsibilities label must use 1.5-line spacing with zero paragraph spacing')
         if p.getElementsByTagNameNS(W,'numPr'):
             lists['{{bullet_'+str(len(lists))+'}}']=p
             if not p.getElementsByTagNameNS(W,'keepLines'):raise ValueError('List paragraph may split across pages')
