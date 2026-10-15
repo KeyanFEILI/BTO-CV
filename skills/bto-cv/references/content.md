@@ -23,6 +23,8 @@ The builder normalizes explicit numeric boundary dates and experience month name
 
 ## IT skills
 
+Keep every source or user-approved skill in IT SKILLS, even when it also appears under experience. Cross-section repetition is intentional: experience shows where a skill was used; IT SKILLS provides the complete inventory. Before delivery, compare the source/approved skills inventory against IT SKILLS and restore missing items. Keep the four-group limit; do not remove skills to reduce repetition across sections.
+
 Use no more than four coherent categories appropriate to that candidate. Retain all tools and methods from the source skills section; include relevant supported tools from experience environments where useful. Do not infer proficiency from a mention. Category consolidation is organizational, not a reason to remove skills. A possible grouping is Identity and data; Programming and frameworks; Systems and platforms; Methods and testing. These titles are examples, not a compulsory taxonomy.
 
 ## Languages and exams
