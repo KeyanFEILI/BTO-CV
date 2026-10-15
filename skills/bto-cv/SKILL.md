@@ -17,6 +17,9 @@ preserve clear wording, source facts and date precision; translate faithfully
 and rephrase only when necessary. Keep MM/YYYY for supplied months, year-only
 dates as years, qualification dates last, at most four IT skill groups, and all
 languages in source order using the prescribed proficiency convention.
+Keep every source or user-approved skill in IT SKILLS, even when it also appears
+under experience. Before delivery, compare the skills inventory with IT SKILLS
+and restore any missing items; keep the four-group limit.
 
 The installed master includes the approved margins, body gaps, native square
 lists and 1.5-line spacing on each “Main responsibilities:” label. Do not imitate
