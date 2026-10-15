@@ -42,15 +42,18 @@ def verify(data,output,template=None):
     template=Path(template) if template else Path(__file__).resolve().parents[1]/'assets/BTO_CV_Template.docx'
     with zipfile.ZipFile(template) as source,zipfile.ZipFile(output) as result:
         if set(source.namelist())!=set(result.namelist()):raise ValueError('DOCX package members differ from the master')
-        for name in source.namelist():
-            if name!='word/document.xml' and source.read(name)!=result.read(name):
-                raise ValueError('Unexpected change to master package part: '+name)
         parts={name:result.read(name) for name in result.namelist()}
+        for name in source.namelist():
+            if name!='word/document.xml' and source.read(name)!=parts[name]:
+                raise ValueError('Unexpected change to master package part: '+name)
         master=minidom.parseString(source.read('word/document.xml'))
     doc=minidom.parseString(parts['word/document.xml'])
     body=doc.getElementsByTagNameNS(W,'body')[0]
     paras=builder.children(body,'p')
-    actual=[(builder.text(p),bool(p.getElementsByTagNameNS(W,'numPr'))) for p in paras if builder.text(p)]
+    actual=[]
+    for p in paras:
+        value=builder.text(p)
+        if value:actual.append((value,bool(p.getElementsByTagNameNS(W,'numPr'))))
     expected=expected_content(data)
     if actual!=expected:raise ValueError('Document paragraphs or native list assignments differ from normalized input')
     if doc.getElementsByTagNameNS(W,'sectPr')[0].toxml()!=master.getElementsByTagNameNS(W,'sectPr')[0].toxml():

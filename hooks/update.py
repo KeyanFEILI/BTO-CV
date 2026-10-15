@@ -73,7 +73,8 @@ def update(data_dir, cli=None, force=False, runner=run, now=None):
         version = manifest['version']
         if not refreshed or refreshed.get('version') != version:
             runner(cli, ['plugin', 'add', PLUGIN, '--json'])
-        after = installed()
+            refreshed = installed()
+        after = refreshed
         if not after or after.get('version') != version or not after.get('enabled'):
             raise RuntimeError('Updated version could not be verified')
         ok = True

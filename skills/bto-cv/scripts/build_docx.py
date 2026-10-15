@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Create native editable DOCX from normalized candidate JSON. Python standard library only."""
 import argparse
-from copy import deepcopy
 import json
 from pathlib import Path
 import re
@@ -41,7 +40,12 @@ LANGUAGE_LEVELS={
     'bonnes notions':'Professional','très bonnes notions':'Professional',
 }
 LEVEL_PATTERN=r'\b(?:'+ '|'.join(re.escape(k) for k in sorted(LANGUAGE_LEVELS,key=len,reverse=True))+r')\b'
-EXAM_PATTERN=r'\b(?:IELTS|TOEFL|TOEIC|DELF|DALF|DILF|TCF|TEF|Cambridge|Goethe|TestDaF|telc|DELE|SIELE|CELI|CILS|HSK|JLPT|OET|PTE|Duolingo|Linguaskill|FCE|CAE|CPE|BULATS|certificat\w*|certified|exam\w*|test|diploma|score)\b'
+EXAM_PATTERN=(
+    r'\b(?:IELTS|TOEFL|TOEIC|DELF|DALF|DILF|TCF|TEF|Cambridge|Goethe|'
+    r'TestDaF|telc|DELE|SIELE|CELI|CILS|HSK|JLPT|OET|PTE|Duolingo|'
+    r'Linguaskill|FCE|CAE|CPE|BULATS|certificat\w*|certified|exam\w*|'
+    r'test|diploma|score)\b'
+)
 
 def language_parts(value):
     """Separate explicit proficiency from supplied exams; never infer a level from a score."""

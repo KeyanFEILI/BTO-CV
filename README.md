@@ -2,7 +2,7 @@
 
 Convert an original PDF or Word CV into an editable BTO Word document in English, using the bundled R.R./A.F.R. master, Century Gothic typography and native square bullet lists.
 
-Version **3.3.1** adds the approved 1.5-line spacing on each “Main responsibilities:” label while retaining the existing bullet spacing and content rules. Wording stays unchanged unless translation or necessary cleanup is required. Candidate facts and documents are never repository fixtures.
+Version **3.4.0** streamlines conversion with one build-and-verify command and shorter, focused skill instructions. The Word master and normalization rules are unchanged from 3.3.1, including 1.5-line spacing on each “Main responsibilities:” label. Wording stays unchanged unless translation or necessary cleanup is required. Candidate facts and documents are never repository fixtures.
 
 ## Install and update
 
@@ -40,7 +40,15 @@ python -m unittest discover -s tests -v
 python skills/bto-cv/scripts/build_docx.py skills/bto-cv/references/input-example.json --check
 ```
 
-The agent can validate a candidate draft without writing another Word file, then build and verify the final artifact:
+For a finished, source-reconciled candidate JSON, build and verify in one process:
+
+```sh
+python skills/bto-cv/scripts/convert.py candidate.json BTO_CV_A.E.docx
+```
+
+The command reports build/verification times without candidate content. It does not render the document or replace source reconciliation and visual review. Reuse extracted text and JSON on revisions. Skip a separate pre-build `--check`: build already validates.
+
+Standalone commands remain available for draft validation and diagnostics:
 
 ```sh
 python skills/bto-cv/scripts/build_docx.py candidate.json --check
