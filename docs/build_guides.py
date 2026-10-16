@@ -6,7 +6,7 @@ from xml.sax.saxutils import escape
 from reportlab.lib import colors
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm
-from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Image
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = json.loads((ROOT / 'plugin.json').read_text())['version']
@@ -54,19 +54,22 @@ team = [
     p('Set up BTO CV', 'title'),
     p('One-time setup for colleagues. Your local Codex agent handles the technical steps.', 'sub'),
     p('1. Get repository access', 'h'),
-    p('Use your GitHub account, or create one at <link href="https://github.com/signup" color="#00665F">github.com/signup</link>. Send your GitHub username to Keyan FEILI. If repository access requires an invitation, accept it and confirm you can open <link href="https://github.com/KeyanFEILI/BTO-CV" color="#00665F">KeyanFEILI/BTO-CV</link>.'),
+    p('Send your GitHub username to Keyan FEILI. Accept any invitation and confirm you can open <link href="https://github.com/KeyanFEILI/BTO-CV" color="#00665F">KeyanFEILI/BTO-CV</link>. Need an account? Use <link href="https://github.com/signup" color="#00665F">github.com/signup</link>.'),
     p('2. Open a local Codex chat', 'h'),
-    p('Open the Codex desktop app and sign in with your own account. Use a local chat that can run commands on your computer. If that option is unavailable, ask Keyan or IT for help.'),
+    p('Open the Codex desktop app, sign in and start a local chat that can run commands on your computer. Ask Keyan or IT if this option is unavailable.'),
+    p('For fewer setup prompts, click the permissions control below the message box and select <b>Approve for me</b>. If unavailable or restricted, use <b>Ask for approval</b>.'),
+    Image(str(ROOT/'docs/assets/approve-for-me.png'), width=13*cm, height=13*cm*237/858, hAlign='LEFT'),
+    p('Eligible actions get automatic review, not guaranteed approval. Sign-in and hook trust still need your input. Menu appearance and model choice may differ.', 'small'),
     p('3. Attach this PDF and send this message', 'h'),
-    p('Follow the agent setup checklist on page 2 and install BTO CV for me. Reuse an existing installation, refresh the registered repository, and verify the enabled version against its current plugin.json. Help me complete sign-in and hook review, then test with a fictional CV. Do not ask me to share passwords or tokens.', 'box'),
+    p('Set up BTO CV using the agent checklist on page 2. Reuse or update my installation, verify the current version, guide sign-in and hook review, and test a fictional CV. Never ask for passwords or tokens.', 'box'),
     p('4. Complete the setup prompts', 'h'),
-    p('Complete any required GitHub sign-in yourself in the browser. Approve only the missing tools you need. Review and trust the BTO update hook when Codex offers its supported review control. Installation alone does not trust the hook.'),
+    p('Complete GitHub sign-in in the browser and approve any required missing tools. Review and trust the BTO update hook when prompted; installation alone does not trust it.'),
     p('5. Start a new chat and use BTO CV', 'h'),
-    p('After setup is verified, start a new local chat and select BTO CV where available, or ask to use the installed BTO CV skill. Attach the original CV and send:'),
+    p('After verified setup, start a new local chat, select BTO CV or ask to use its installed skill. Attach your original CV and send:'),
     p('Convert this into an editable BTO Word CV. Preserve the facts and wording, except for necessary translation and corrections.', 'box'),
     p('You can also attach a job description for light tailoring. Use only candidate documents permitted by your company. Check the finished CV before sharing it.'),
     p('Updates and help', 'h'),
-    p('The trusted hook checks at session startup or resume, at most once daily. Start a new chat after a package update; review the hook again if prompted. Contact Keyan for setup issues or shared-template changes.'),
+    p('Updates are checked at session startup/resume, at most daily. Start a new chat after an update and review the hook again if prompted. Contact Keyan for setup or shared-format changes.'),
     PageBreak(),
     p('Agent setup checklist', 'title'),
     p('For the local Codex agent. The user explicitly requests these steps by sending the setup message on page 1.', 'sub'),
@@ -87,7 +90,7 @@ team = [
     p('4. Test in a fresh chat', 'h'),
     p('Generate an editable Word CV from the installed examples/sample-cv.txt. Verify source facts, native square bullets and every rendered page. Prefer Microsoft Word on Windows; the CV requires Century Gothic and Wingdings. Report missing fonts or incomplete visual review. Use the template and generator from the same installed release; no template download is needed during conversion.'),
     p('Report installed version, enabled status, updater result, hook verification and sample-CV result separately. If hook execution or a required check cannot be verified, explain the remaining step and contact Keyan; do not claim full setup success.'),
-    p('Official reference: <link href="https://developers.openai.com/plugins/build/plugins" color="#00665F">OpenAI plugin packaging, marketplace commands and hook trust</link>. BTO-specific behavior: the refreshed repository README and installed hook.', 'small'),
+    p('Official references: <link href="https://developers.openai.com/plugins/build/plugins" color="#00665F">OpenAI plugin packaging and hook trust</link>; <link href="https://learn.chatgpt.com/docs/permission-modes" color="#00665F">permission modes</link>. BTO-specific behavior: repository README and installed hook.', 'small'),
 ]
 
 owner = [
@@ -98,6 +101,7 @@ owner = [
     p('For a personal private repository, collaborators can have write access. The instruction to contact Keyan for shared changes is workflow guidance, not access enforcement. Manage invitations and remove access when no longer needed.'),
     p('2. Confirm the supported local environment', 'h'),
     p('Use a local Codex environment with command execution and plugin support. Python 3, Git and a plugin-capable Codex CLI must resolve in the hook environment. Verify Git credentials non-interactively. Prefer Microsoft Word for CV rendering on Windows. Required CV fonts are Century Gothic and Wingdings.'),
+    p('The team guide shows the optional Approve for me permission mode. It routes eligible requests to automatic review; it does not guarantee approval or replace sign-in and hook trust. If unavailable or restricted, use Ask for approval.'),
     p('3. Run the separate-account pilot', 'h'),
     p('Have one colleague follow both pages of the team guide. Confirm all of the following:'),
     p('<b>Installation:</b> one active BTO plugin is enabled, with version matching the refreshed marketplace plugin.json. Resolve any old standalone copy only after verification.'),
