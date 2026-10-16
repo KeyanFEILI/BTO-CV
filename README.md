@@ -60,7 +60,7 @@ Tests run in GitHub Actions on Windows and Linux. Checks cover date normalizatio
 
 The Word master is `skills/bto-cv/assets/BTO_CV_Template.docx`, paired with `skills/bto-cv/scripts/build_docx.py`. Only `word/document.xml` changes in generated documents. The anonymized master banner, styles, numbering and page settings remain intact. Do not force page counts or shrink fonts. Rendered pagination depends on content, fonts and software.
 
-For releases, bump `plugin.json`, keep instructions, examples and tests consistent, and run the full suite. Never commit candidate originals, approved candidate CVs, extracted text or reconciliation data. Use fictional examples such as [sample-cv.txt](examples/sample-cv.txt). Setup PDFs in `docs/` predate the current content contract; use this README and the installed skill for current conversion rules.
+For releases, bump `plugin.json`, keep instructions, examples and tests consistent, and run the full suite. Never commit candidate originals, approved candidate CVs, extracted text or reconciliation data. Use fictional examples such as [sample-cv.txt](examples/sample-cv.txt). The current onboarding PDFs in `docs/` cover colleague setup and owner acceptance checks. Rebuild them with `python docs/build_guides.py` (ReportLab required), then render and inspect every page before publishing. The refreshed repository manifest remains the installation-version authority.
 
 ## Automatic updater
 
