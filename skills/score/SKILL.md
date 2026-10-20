@@ -67,7 +67,10 @@ do not substitute an employer's location or infer a current residence. Preserve
 phone prefixes, email spelling and every stated language with its actual level.
 Use empty strings for missing details and display “Not provided”; flag conflicts.
 For each JD/candidate assessment, add `relevant_experience` as a concise years
-estimate or range and `short_description` as a brief evidence-based fit/gap summary.
+value or range only, such as `7-8 years`, `12 years` or `10+ years`, and
+`short_description` as a brief fit/gap summary. Never display "approximately",
+"evidenced through", source snapshot dates or parenthetical scope calculations
+in experience entries, in chat or Excel. Keep those details in private notes.
 Calculate relevant years for that JD from supported role dates, count overlapping
 periods once, and retain date uncertainty. Do not substitute total career length
 or invent precision. Use “Cannot determine” when dates/scope are insufficient.
@@ -105,7 +108,10 @@ candidate ranking is delivered, also update the configured shared workbook using
 [shared-workbook.md](references/shared-workbook.md). This is the default output,
 not an optional export. Export only final scores >=80/100; keep the full chat
 ranking. Match the JD to an existing role sheet before creating any new sheet.
-New sheets for unrelated roles must reuse the existing headers. Reuse the exact
+Never add, rename or reorder headers on existing sheets. New sheets for unrelated
+roles must copy existing headers exactly. Missing columns are omitted from Excel;
+keep those fields in chat/private notes. Do not create Language flags or Ranking
+run columns, or insert their contents into other fields. Reuse the exact
 ranking data; do not reassess CVs for Excel.
 Report verified workbook updates or a concrete sync blocker with the chat list;
 never claim a failed or unverified write succeeded. Do not delay the ranking if

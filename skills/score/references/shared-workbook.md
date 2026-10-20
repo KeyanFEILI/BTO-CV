@@ -36,13 +36,14 @@ after the JD's job title, replacing Excel-invalid characters, limiting it to 31
 characters and resolving name collisions with a short suffix. Copy the complete
 header row, in the same order and wording, from the most suitable populated role
 sheet; preserve header styling and table conventions. Do not copy candidate rows.
-Keep the JD title/reference in a ranking-run field or alongside the assessment
-scope so different postings sharing a role sheet remain distinguishable.
+Keep the JD title/reference, batch scope and date in private assessment notes and
+the chat summary. Do not add a Ranking run column or put this metadata into
+candidate cells.
 
 Map by header text, not fixed letters; preserve the user's layout. The
 following header mapping is a starting point; verify the actual sheet headers.
 
-| Ranking data | Existing header or new header when absent |
+| Ranking data | Existing header to reuse, when present |
 | --- | --- |
 | rank | Rank |
 | candidate (full name) | Candidate |
@@ -53,15 +54,26 @@ following header mapping is a starting point; verify the actual sheet headers.
 | phone | Phone Number |
 | email | Email address |
 | source_languages | Languages |
-| JD language checks | Language flags |
+
+The existing header row is fixed: never add, rename or reorder columns. If a
+field has no existing equivalent column, omit it from Excel and retain it in chat
+and private notes. Language flags and ranking-run metadata stay outside Excel.
+Do not repurpose Notes, unused columns or descriptions to bypass this rule.
 
 For Match, inspect the existing number format: a percentage cell receives
 score/100; a numeric score column receives the /100 number. Never turn 78/100 into
-7800%. Preserve core/bonus breakdown in the description if no dedicated columns
-exist. Keep phone and email as literal text, including international prefixes;
+7800%. Keep the core/bonus breakdown in chat/private notes unless dedicated
+columns already exist; do not append score arithmetic to the short description.
+Keep phone and email as literal text, including international prefixes;
 never interpret source text as a formula. Reuse an equivalent existing header
-rather than adding duplicates. Append only missing ranking columns, without
-shifting existing formulas or other columns; extend native tables as needed.
+rather than adding duplicates. Extend native tables over the new rows only;
+preserve their existing columns.
+
+XP contains only a supported years value or range, e.g. `7-8 years` or
+`12 years`. Never add "approximately", "evidenced through", snapshot dates or
+parenthetical scope explanations. Retain date uncertainty as a range and keep
+the calculation, snapshot limits and scope distinctions in private notes. If
+experience cannot be determined, leave XP blank rather than inventing a value.
 
 ## Update rows safely
 
@@ -75,7 +87,7 @@ every eligible listed candidate, not only the top five. If none qualifies, repor
 that no candidate met the Excel threshold and leave the workbook unchanged,
 including not creating an empty sheet. Missing information means an empty cell,
 not “Not provided”, “Unknown”, “Cannot determine”, a dash or a guessed value.
-An explicit language gap or unspecified required level remains a meaningful flag.
+Report explicit language gaps and unspecified required levels in chat.
 
 Match an existing candidate by normalised email first, or by full name with a
 corroborating detail such as phone or career history. Never merge namesakes or
@@ -93,12 +105,30 @@ formatting and candidates not included in this run. Do not reorder whole rows
 without preserving their associated manual fields.
 
 Rank describes the current comparison set; do not imply that ranks from separate
-batches form one global ranking. When updating only a subset, label that scope
-and date beside the affected ranks or in a dedicated ranking-run column. Re-rank
+batches form one global ranking. When updating only a subset, state its scope
+and date in chat and private notes, without annotating workbook cells. Re-rank
 the full posting pool only when its assessments are available under the same JD
 rubric; never invent scores for existing unassessed candidates.
 
-Batch writes where supported and write sequentially to the workbook. Re-read the
+## Efficient writes and verification
+
+Prepare the Excel projection once with `scripts/workbook_rows.py` using final
+ranking JSON and observed headers; it omits missing columns without changing the
+schema. Match identities and row destinations before applying its values. The
+helper does not access Excel or decide whether a CV supports a rating.
+
+Batch reads and writes through the connected workbook tool when available; cache
+sheet names, headers and format observations for this run. In Excel web, prefer
+rectangular range operations when supported. If falling back to individual cells,
+wait until the accessible cell reference matches the intended address before
+reading or typing. Name Box text alone does not confirm selection has settled.
+Commit an edit and confirm it completed before navigating to the next cell. A
+timeout may leave a partial write: re-read the affected range and resume only
+missing/different values, never replay the whole append. After one recovery for
+the same transport/selection failure, retain pending changes and report the
+blocker instead of cycling through copy, paste, formatting and reload attempts.
+
+Write sequentially to the workbook. Re-read the
 affected rows immediately before writing if colleagues are editing; refresh and
 reconcile conflicts rather than overwriting newer changes. After writing, read
 back affected rows to verify names, posting, scores, field placement and blanks.

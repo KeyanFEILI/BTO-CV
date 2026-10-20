@@ -2,6 +2,7 @@
 """Validate evidence assessments and rank every CV separately for each JD."""
 import argparse
 import json
+import re
 from itertools import combinations
 from pathlib import Path
 
@@ -17,6 +18,21 @@ def text(value):
 
 def evidence(value):
     return isinstance(value, list) and bool(value) and all(text(v) for v in value)
+
+
+def experience_label(value):
+    """Validate the display value; calculation notes belong in private metadata."""
+    require(isinstance(value, str), 'relevant_experience must be text')
+    if value in ('', 'Cannot determine'):
+        return value
+    match = re.fullmatch(r'(\d+(?:\.\d+)?)(?:\s*[-–]\s*(\d+(?:\.\d+)?))?(\+)? years?', value)
+    require(match is not None,
+            'relevant_experience must contain plain years or a range (e.g. 7-8 years); '
+            'keep approximately, snapshot dates and scope explanations in private notes')
+    low, high, plus = match.groups()
+    require(not (high and plus), 'A years range cannot also use +')
+    require(high is None or float(low) <= float(high), 'Experience range is reversed')
+    return value
 
 
 def indexed(items, label):
@@ -83,6 +99,7 @@ def rank(data):
         job = jobs[jid]
         for field in ('relevant_experience', 'short_description'):
             require(isinstance(assessment.get(field, ''), str), f'{field} must be text')
+        experience_label(assessment.get('relevant_experience', ''))
         ratings = assessment.get('ratings')
         require(isinstance(ratings, dict), 'ratings must be an object')
         require(set(ratings) == {c['id'] for c in job['criteria']}, 'Incomplete criterion ratings')

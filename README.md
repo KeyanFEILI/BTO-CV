@@ -2,7 +2,8 @@
 
 Convert an original PDF or Word CV into an editable BTO Word document in English, using the bundled R.R./A.F.R. master, Century Gothic typography and native square bullet lists.
 
-Version **4.0.0** bundles BTO CV conversion, `score` for JD-specific rankings and shared Excel shortlists, and `trello` for Trello cards without file uploads. It also requires every source or user-approved skill to remain in IT SKILLS even when repeated under experience, with an inventory check before delivery. It retains the streamlined build-and-verify command and unchanged Word layout, including 1.5-line spacing on each “Main responsibilities:” label. Wording stays unchanged unless translation or necessary cleanup is required. Candidate facts and documents are never repository fixtures.
+Version **4.0.1** preserves existing Excel headers, uses plain experience ranges,
+and validates the Excel projection before writing. It bundles BTO CV conversion, `score` for JD-specific rankings and shared Excel shortlists, and `trello` for Trello cards without file uploads. It also requires every source or user-approved skill to remain in IT SKILLS even when repeated under experience, with an inventory check before delivery. It retains the streamlined build-and-verify command and unchanged Word layout, including 1.5-line spacing on each “Main responsibilities:” label. Wording stays unchanged unless translation or necessary cleanup is required. Candidate facts and documents are never repository fixtures.
 
 ## Install and update
 
@@ -45,7 +46,10 @@ accessible. Only final scores **>=80/100** qualify for Excel; the chat still lis
 all candidates. Match the JD to an existing role sheet. Create a sheet for an
 unrelated role using the JD title and the existing headers. Repeated candidates
 update their existing row, missing details stay blank, and colleague-managed
-fields are preserved. No background process or workbook access is installed.
+fields are preserved. Existing headers are never added, renamed or reordered;
+fields without a column stay in chat/private notes. XP uses plain years or ranges.
+Language flags, batch labels and score arithmetic are not appended to workbook
+descriptions or new columns. No background process or workbook access is installed.
 
 Configure the workbook with `SCORE_WORKBOOK_URL` or a private, ignored
 `skills/score/references/workbook.local.json` containing `{"url": "your sharing link"}`.
