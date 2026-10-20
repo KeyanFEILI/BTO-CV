@@ -14,7 +14,7 @@ class UpdateTests(unittest.TestCase):
     def simulate(self, current='3.0.0', target='3.1.0', fail=False, origin=None, enabled=True, refresh_updates=False):
         self.calls=[];self.version=current
         tmp=tempfile.TemporaryDirectory();self.addCleanup(tmp.cleanup)
-        root=Path(tmp.name);(root/'plugin.json').write_text(json.dumps({'name':'bto-cv','version':target}))
+        root=Path(tmp.name);(root/'plugin.json').write_text(json.dumps({'name':'bto-hr','version':target}))
         def runner(cli,args):
             self.calls.append(args)
             if args[:3]==['plugin','marketplace','list']:

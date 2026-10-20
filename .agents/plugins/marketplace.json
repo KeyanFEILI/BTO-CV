@@ -1,11 +1,11 @@
 {
   "name": "bto-cv-marketplace",
   "interface": {
-    "displayName": "BTO CV Marketplace"
+    "displayName": "BTO HR Marketplace"
   },
   "plugins": [
     {
-      "name": "bto-cv",
+      "name": "bto-hr",
       "source": {
         "source": "local",
         "path": "./"

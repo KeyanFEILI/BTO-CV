@@ -1,8 +1,8 @@
-# BTO CV
+# BTO HR
 
 Convert an original PDF or Word CV into an editable BTO Word document in English, using the bundled R.R./A.F.R. master, Century Gothic typography and native square bullet lists.
 
-Version **3.6.0** bundles BTO CV conversion, `score` for JD-specific rankings and shared Excel shortlists, and `bto-talent-pool` for Trello cards without file uploads. It also requires every source or user-approved skill to remain in IT SKILLS even when repeated under experience, with an inventory check before delivery. It retains the streamlined build-and-verify command and unchanged Word layout, including 1.5-line spacing on each “Main responsibilities:” label. Wording stays unchanged unless translation or necessary cleanup is required. Candidate facts and documents are never repository fixtures.
+Version **4.0.0** bundles BTO CV conversion, `score` for JD-specific rankings and shared Excel shortlists, and `trello` for Trello cards without file uploads. It also requires every source or user-approved skill to remain in IT SKILLS even when repeated under experience, with an inventory check before delivery. It retains the streamlined build-and-verify command and unchanged Word layout, including 1.5-line spacing on each “Main responsibilities:” label. Wording stays unchanged unless translation or necessary cleanup is required. Candidate facts and documents are never repository fixtures.
 
 ## Install and update
 
@@ -10,13 +10,13 @@ Use a local Codex environment with plugin support, Python 3 and Git. The reposit
 
 Copy this message into a local Codex chat:
 
-> Install BTO CV from https://github.com/KeyanFEILI/BTO-CV.git. Check whether bto-cv@bto-cv-marketplace is already installed. If not, register the marketplace with `codex plugin marketplace add https://github.com/KeyanFEILI/BTO-CV.git --ref main`, then run `codex plugin add bto-cv@bto-cv-marketplace`. Verify that it is installed and enabled, preserve any standalone skill until the plugin is verified, and tell me when to start a new chat. Do not ask for passwords or tokens.
+> Install BTO CV from https://github.com/KeyanFEILI/BTO-CV.git. Check whether bto-hr@bto-cv-marketplace is already installed. If not, register the marketplace with `codex plugin marketplace add https://github.com/KeyanFEILI/BTO-CV.git --ref main`, then run `codex plugin add bto-hr@bto-cv-marketplace`. Verify that it is installed and enabled, preserve any standalone skill until the plugin is verified, and tell me when to start a new chat. Do not ask for passwords or tokens.
 
-After installation, start a new chat and select **BTO CV**, attach the original CV and ask for a BTO Word conversion. [Install BTO CV](codex://plugins/install/bto-cv?marketplace=bto-cv-marketplace) opens the install screen after marketplace registration where supported.
+After installation, start a new chat and select **BTO HR**, attach the original CV and ask for a BTO Word conversion. [Install BTO CV](codex://plugins/install/bto-hr?marketplace=bto-cv-marketplace) opens the install screen after marketplace registration where supported.
 
 To update:
 
-> Update bto-cv@bto-cv-marketplace from its registered source. Run `codex plugin marketplace upgrade bto-cv-marketplace`, inspect the installed version, and use the supported plugin update or reinstall flow if needed. Verify the result without creating a second copy and tell me when to start a new chat.
+> Update bto-hr@bto-cv-marketplace from its registered source. Run `codex plugin marketplace upgrade bto-cv-marketplace`, inspect the installed version, and use the supported plugin update or reinstall flow if needed. Verify the result without creating a second copy and tell me when to start a new chat.
 
 Conversion uses the template and generator from the **same installed release**. It does not fetch a template from GitHub or need network access. A failed update check does not prevent conversion with the verified installed pair. Start a new chat after an update; an existing chat does not hot-reload instructions.
 
@@ -55,7 +55,7 @@ copy. See [the shared-workbook workflow](skills/score/references/shared-workbook
 
 ## Trello Talent Pool
 
-Use `$bto-talent-pool` with candidate CVs to create or update cards on the BTO
+Use `$trello` with candidate CVs to create or update cards on the BTO
 Talent Pool board. It checks for duplicates, fills factual profile fields, chooses
 the appropriate role list and applies one supported seniority label. Client
 opportunity copies require a user request and retain the pool original.
@@ -65,7 +65,7 @@ card creation does not require a document conversion. Existing attachments and
 colleague notes are preserved. BTO CV conversion remains available separately.
 Users need an authenticated Trello connection and access to the board; installing
 the skill does not grant access or create cards. See the
-[Trello skill](skills/bto-talent-pool/SKILL.md) for the card conventions.
+[Trello skill](skills/trello/SKILL.md) for the card conventions.
 
 ## Verification and maintenance
 
@@ -106,3 +106,12 @@ The BTO-only SessionStart hook checks the registered marketplace at startup/resu
 Python 3, Git and a plugin-capable Codex CLI must be available. `BTO_CODEX_BIN` supports an explicit CLI path. Git access must work non-interactively; credentials are never requested or printed by the hook. To diagnose, run the installed `hooks/update.py --force --check`. `current` or `updated` confirms success; `failed` needs attention. A changed hook definition may require renewed review. New chats are required after package updates.
 
 Maintainer: Keyan FEILI. Colleagues may generate and edit their own CVs; shared package changes are coordinated with Keyan. This convention is not an access-control mechanism.
+
+## Upgrade from BTO CV
+
+Version 4.0.0 renames the plugin to `bto-hr` (display name **BTO HR**) and the
+Talent Pool skill to `trello`. The repository URL and marketplace registration
+remain unchanged. Refresh the marketplace, install `bto-hr@bto-cv-marketplace`,
+verify its three skills, then remove the old `bto-cv@bto-cv-marketplace` install
+to avoid duplicates. Preserve private workbook configuration before removal and
+restore it in the new Score installation. Start a new chat after migration.

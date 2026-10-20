@@ -8,7 +8,7 @@ import subprocess
 import time
 
 MARKET = 'bto-cv-marketplace'
-PLUGIN = 'bto-cv@' + MARKET
+PLUGIN = 'bto-hr@' + MARKET
 SOURCE = 'https://github.com/KeyanFEILI/BTO-CV.git'
 
 def run(cli, args):
@@ -68,7 +68,7 @@ def update(data_dir, cli=None, force=False, runner=run, now=None):
         refreshed = installed()
         root = Path(source['root'])
         manifest = json.loads((root / 'plugin.json').read_text(encoding='utf-8'))
-        if manifest.get('name') != 'bto-cv' or not manifest.get('version'):
+        if manifest.get('name') != 'bto-hr' or not manifest.get('version'):
             raise RuntimeError('Invalid BTO manifest')
         version = manifest['version']
         if not refreshed or refreshed.get('version') != version:
@@ -79,11 +79,11 @@ def update(data_dir, cli=None, force=False, runner=run, now=None):
             raise RuntimeError('Updated version could not be verified')
         ok = True
         if version != before.get('version'):
-            notify('BTO CV updated to ' + version + '. Start a new chat before generating a CV. Review the hook again if Codex requests it.')
+            notify('BTO HR updated to ' + version + '. Start a new chat before using BTO HR skills. Review the hook again if Codex requests it.')
             return 'updated'
         return 'current'
     except (OSError, ValueError, KeyError, TypeError, RuntimeError, subprocess.TimeoutExpired):
-        notify('BTO CV automatic update could not be verified. No uninstall was attempted. Ask Keyan to check GitHub sign-in, Git and Codex CLI access. Retrying at a later session start after one hour.')
+        notify('BTO HR automatic update could not be verified. No uninstall was attempted. Ask Keyan to check GitHub sign-in, Git and Codex CLI access. Retrying at a later session start after one hour.')
         return 'failed'
     finally:
         payload = {'checked_at': now, 'ok': ok, 'version': version}
@@ -99,7 +99,7 @@ def main():
     folder = os.environ.get('PLUGIN_DATA')
     if not folder:
         home = Path(os.environ.get('CODEX_HOME', str(Path.home() / '.codex')))
-        folder = home / 'plugin-data' / MARKET / 'bto-cv'
+        folder = home / 'plugin-data' / MARKET / 'bto-hr'
     try:
         result = update(folder, force=args.force)
         if args.check:

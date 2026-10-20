@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "bto-cv",
-  "version": "3.6.0",
+  "name": "bto-hr",
+  "version": "4.0.0",
   "description": "Create BTO Word CVs, rank candidates against job descriptions, and organise Trello Talent Pool cards.",
   "author": {
     "name": "Keyan FEILI"
@@ -10,14 +10,14 @@
   "extensions": {
     "com.openai": {
       "interface": {
-        "displayName": "BTO CV",
-        "shortDescription": "Original CV in. Editable BTO Word CV out.",
+        "displayName": "BTO HR",
+        "shortDescription": "BTO CVs, candidate scoring and Trello talent cards.",
         "category": "Productivity",
         "defaultPrompt": [
           "Convert the attached original CV into an editable BTO Word document in English, preserving wording except for necessary translation and cleanup.",
           "Create a fictional BTO Word CV to test the formatting and native bullet lists.",
           "Use $score to rank the attached CVs against each job description and update my configured shared Excel shortlist for candidates scoring at least 80/100.",
-          "Use $bto-talent-pool to create or update Talent Pool cards from the attached CVs, without uploading files."
+          "Use $trello to create or update Talent Pool cards from the attached CVs, without uploading files."
         ],
         "brandColor": "#00665E",
         "longDescription": "Create an editable .docx using the BTO reference banner, Century Gothic fonts, measured spacing and native square bullet lists. Preserves supplied facts. Includes a deterministic Word generator and optional HTML preview. Includes Score for JD-specific candidate rankings, language flags and shared Excel shortlists. Includes Trello Talent Pool card creation, role classification, seniority labels and opportunity copies, without file uploads."

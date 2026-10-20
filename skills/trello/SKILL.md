@@ -1,5 +1,5 @@
 ---
-name: bto-talent-pool
+name: trello
 description: Create and organize candidate cards from CVs on BTO LUX's Trello Talent Pool board, with role classification, seniority labels, and client opportunity copies. File uploads are excluded.
 ---
 
