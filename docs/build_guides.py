@@ -10,7 +10,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Image
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = json.loads((ROOT / 'plugin.json').read_text())['version']
-DATE = '16 October 2026'
+DATE = '20 October 2026'
 TEAL = colors.HexColor('#00665F')
 INK = colors.HexColor('#203239')
 STYLES = {
@@ -37,7 +37,7 @@ def footer(canvas, doc):
     canvas.line(1.8*cm, 1.5*cm, 19.2*cm, 1.5*cm)
     canvas.setFont('Helvetica', 8)
     canvas.setFillColor(INK)
-    canvas.drawString(1.8*cm, 1.05*cm, f'BTO CV | Guide checked against v{VERSION} | {DATE}')
+    canvas.drawString(1.8*cm, 1.05*cm, f'BTO HR | Guide checked against v{VERSION} | {DATE}')
     canvas.drawRightString(19.2*cm, 1.05*cm, str(doc.page))
 
 
@@ -45,92 +45,98 @@ def build(name, story):
     target=ROOT/'docs'/name
     doc=SimpleDocTemplate(str(target), pagesize=(21*cm,29.7*cm), leftMargin=1.8*cm,
                           rightMargin=1.8*cm, topMargin=1.6*cm, bottomMargin=2*cm,
-                          title=name.replace('_',' ').replace('.pdf',''), author='BTO CV')
+                          title=name.replace('_',' ').replace('.pdf',''), author='BTO HR')
     doc.build(story, onFirstPage=footer, onLaterPages=footer)
     print(target)
 
 
 team = [
-    p('Set up BTO CV', 'title'),
-    p('One-time setup for colleagues. Your local Codex agent handles the technical steps.', 'sub'),
-    p('1. Get repository access', 'h'),
-    p('Send your GitHub username to Keyan FEILI. Accept any invitation and confirm you can open <link href="https://github.com/KeyanFEILI/BTO-CV" color="#00665F">KeyanFEILI/BTO-CV</link>. Need an account? Use <link href="https://github.com/signup" color="#00665F">github.com/signup</link>.'),
+    p('Set up BTO HR', 'title'),
+    p('One plugin. Three skills: BTO CV, Score and Trello. One-time setup for colleagues.', 'sub'),
+    p('1. Check access', 'h'),
+    p('Confirm you can open <link href="https://github.com/KeyanFEILI/BTO-CV" color="#00665F">KeyanFEILI/BTO-CV</link> with your own GitHub account. If access is restricted, send your username to Keyan FEILI and accept the invitation. The repository URL remains BTO-CV; the plugin is now BTO HR.'),
     p('2. Open a local Codex chat', 'h'),
-    p('Open the Codex desktop app, sign in and start a local chat that can run commands on your computer. Ask Keyan or IT if this option is unavailable.'),
-    p('For fewer setup prompts, click the permissions control below the message box and select <b>Approve for me</b>. If unavailable or restricted, use <b>Ask for approval</b>.'),
+    p('Sign in to the Codex desktop app and start a local chat with command execution. For fewer installation prompts, select <b>Approve for me</b> below the message box. If unavailable, use <b>Ask for approval</b>.'),
     Image(str(ROOT/'docs/assets/approve-for-me.png'), width=13*cm, height=13*cm*237/858, hAlign='LEFT'),
-    p('Eligible actions get automatic review, not guaranteed approval. Sign-in and hook trust still need your input. Menu appearance and model choice may differ.', 'small'),
-    p('3. Attach this PDF and send this message', 'h'),
-    p('Set up BTO CV using the agent checklist on page 2. Reuse or update my installation, verify the current version, guide sign-in and hook review, and test a fictional CV. Never ask for passwords or tokens.', 'box'),
-    p('4. Complete the setup prompts', 'h'),
-    p('Complete GitHub sign-in in the browser and approve any required missing tools. Review and trust the BTO update hook when prompted; installation alone does not trust it.'),
-    p('5. Start a new chat and use BTO CV', 'h'),
-    p('After verified setup, start a new local chat, select BTO CV or ask to use its installed skill. Attach your original CV and send:'),
-    p('Convert this into an editable BTO Word CV. Preserve the facts and wording, except for necessary translation and corrections.', 'box'),
-    p('You can also attach a job description for light tailoring. Use only candidate documents permitted by your company. Check the finished CV before sharing it.'),
-    p('Updates and help', 'h'),
-    p('Updates are checked at session startup/resume, at most daily. Start a new chat after an update and review the hook again if prompted. Contact Keyan for setup or shared-format changes.'),
+    p('Automatic review does not guarantee approval or replace sign-in and hook trust. The menu may look different.', 'small'),
+    p('3. Drop this PDF into Codex', 'h'),
+    p('Attach this PDF and send the following message. The agent-readable installation checklist is on page 2; workflow setup is on page 3.'),
+    p('Set up BTO HR using all three pages of this guide. Reuse or migrate my installation, verify the three skills, guide sign-in and hook review, and configure my shared Excel link privately. Check Trello access without creating cards. Never request passwords or tokens. Report what passed and what still needs my input.', 'box'),
+    p('4. Finish sign-in, then start a new chat', 'h'),
+    p('Complete GitHub, Microsoft or Trello sign-in yourself when needed. Review the BTO update hook when prompted. Start a new chat after installation; search for <b>bto-cv</b>, <b>score</b> or <b>trello</b> under BTO HR. Technical names use the prefix <b>bto-hr:</b>.'),
+    p('Need help?', 'h'),
+    p('Contact Keyan for repository access, the approved shared Excel link, Trello board access or shared workflow changes. Installing the plugin does not grant access to those services.'),
     PageBreak(),
-    p('Agent setup checklist', 'title'),
-    p('For the local Codex agent. The user explicitly requests these steps by sending the setup message on page 1.', 'sub'),
-    p('1. Check access and tools', 'h'),
-    p('Reuse Python 3, Git and a plugin-capable Codex CLI. Install missing tools only with the user\'s approval. Verify non-interactive Git access to the repository; browser sign-in alone is not proof. If authentication is needed, guide the user through the supported browser flow. GitHub CLI is optional. Never request or print credentials.'),
-    p('2. Register, refresh and verify', 'h'),
-    p('Inspect existing marketplaces and installations first. Reuse the BTO Git source tracking main. If absent, register it:'),
+    p('Agent installation checklist', 'title'),
+    p('For the local Codex agent when the user requests setup. Complete page 3 as well.', 'sub'),
+    p('1. Inspect the environment', 'h'),
+    p('Reuse Python 3, Git and a plugin-capable Codex CLI. Guide supported installation for missing tools and user-controlled sign-in. Verify Git repository access non-interactively; browser sign-in alone is insufficient. Never request, print or store credentials. GitHub CLI is optional.'),
+    p('2. Refresh and install', 'h'),
+    p('Inspect current marketplaces and plugins first. Reuse the BTO Git source tracking main. Register only if absent:'),
     command('codex plugin marketplace add https://github.com/KeyanFEILI/BTO-CV.git --ref main'),
     command('codex plugin marketplace upgrade bto-cv-marketplace'),
+    command('codex plugin add bto-hr@bto-cv-marketplace --json'),
     command('codex plugin list --marketplace bto-cv-marketplace --json'),
-    p('Read plugin.json at the refreshed marketplace root. The installed BTO version must match that manifest and be enabled. If missing or still behind, install/refresh and verify again:'),
-    command('codex plugin add bto-cv@bto-cv-marketplace --json'),
-    p(f'This guide was checked against v{VERSION}; use the current refreshed manifest, not a fixed minimum version. Preserve any old standalone skill until the plugin works, then resolve duplicates with the user.'),
-    p('3. Verify the updater and hook trust', 'h'),
-    p('Locate the verified installed plugin root. Ensure its hook environment resolves python on Windows (python3 elsewhere), Git and Codex; BTO_CODEX_BIN can specify the CLI path. Run the updater using that installed root:'),
+    p(f'The guide describes v{VERSION}. The current refreshed plugin.json is the version authority. Verify bto-hr is enabled and its installed version matches. Verify skills/bto-cv, skills/score and skills/trello each contain SKILL.md. Do not install three standalone copies.'),
+    p('3. Migrate an older installation', 'h'),
+    p('If bto-cv@bto-cv-marketplace or standalone Score/Talent Pool copies exist, preserve their private workbook configuration first. Install and verify BTO HR before removing the superseded plugin. Restore the private configuration in the new Score installation. Archive standalone duplicates outside skill discovery; preserve unrelated skills. Then remove the old plugin:'),
+    command('codex plugin remove bto-cv@bto-cv-marketplace --json'),
+    p('4. Verify the updater and hook trust', 'h'),
     command('python "<installed-plugin-root>/hooks/update.py" --force --check'),
-    p('Use python3 where appropriate. The command performs an update check; current or updated means success. A failure is not a verified setup. Guide the user through the supported hook review; never bypass trust. In a new local session, verify actual SessionStart execution. A direct script run alone does not prove that the trusted hook fired; a daily-throttled hook may be silent.'),
-    p('4. Test in a fresh chat', 'h'),
-    p('Generate an editable Word CV from the installed examples/sample-cv.txt. Verify source facts, native square bullets and every rendered page. Prefer Microsoft Word on Windows; the CV requires Century Gothic and Wingdings. Report missing fonts or incomplete visual review. Use the template and generator from the same installed release; no template download is needed during conversion.'),
-    p('Report installed version, enabled status, updater result, hook verification and sample-CV result separately. If hook execution or a required check cannot be verified, explain the remaining step and contact Keyan; do not claim full setup success.'),
-    p('Official references: <link href="https://developers.openai.com/plugins/build/plugins" color="#00665F">OpenAI plugin packaging and hook trust</link>; <link href="https://learn.chatgpt.com/docs/permission-modes" color="#00665F">permission modes</link>. BTO-specific behavior: repository README and installed hook.', 'small'),
+    p('Use python3 where appropriate. Verify Python, Git and Codex resolve in the hook environment; BTO_CODEX_BIN can specify the CLI. current or updated confirms the direct script check. Guide the supported hook review without bypassing trust. In a fresh local session verify actual SessionStart execution separately; a direct script result or old state alone is not lifecycle proof. A throttled hook may be silent.'),
+    p('Keep private setup outside Git', 'h'),
+    p('Do not commit workbook links, candidate files, extracted text, rankings or credentials. Package upgrades may replace the installed cache: preserve the private workbook destination before updating and restore it afterward.'),
+    PageBreak(),
+    p('Configure and use the skills', 'title'),
+    p('All three skills are bundled. Service access and workflow checks are separate.', 'sub'),
+    p('BTO HR : bto cv', 'h'),
+    p('Attach an original CV; optionally add a JD. Ask: Convert this into an editable BTO Word CV, preserving facts and wording except for necessary translation and corrections. Verify a fictional sample first using the installed examples/sample-cv.txt and the same release\'s template/generator. Inspect editable text, native square bullets and every rendered page. Required fonts: Century Gothic and Wingdings; prefer Word rendering on Windows. Report missing fonts or incomplete visual review.'),
+    p('BTO HR : score', 'h'),
+    p('Attach one or more JDs and multiple CVs. Each JD receives its own ranking: 95 role-fit points plus up to 5 for relevant large-company/consulting experience. Language gaps are flagged without changing scores. Every entry includes full name, latest stated location, relevant years, description, phone, email and source language levels.'),
+    p('Ask for the approved shared Excel link once. Configure SCORE_WORKBOOK_URL or a private references/workbook.local.json inside the installed Score skill, containing a JSON object with a url field. Never commit the link. Confirm the user has workbook access; guide sign-in when necessary. Do not invent a destination.'),
+    p('Each ranking also updates Excel for candidates scoring <b>at least 80/100</b>; all candidates remain in the chat ranking. Match the JD to an existing role sheet. Create a new sheet only for an unrelated role, using the JD title and existing headers. Reuse candidate rows, leave missing data blank and preserve colleague notes, rates and existing known values. Read back writes and confirm save; otherwise report the sync blocker. This runs during the task, not in the background.'),
+    p('BTO HR : trello', 'h'),
+    p('Use an authenticated Trello connection and verify access to the BTO LUX Talent Pool board. Read lists and labels; do not create test cards. The skill checks duplicates, creates factual candidate cards, chooses a role list and applies seniority. Unknown fields stay empty. Client opportunity copies require a user request. <b>No file uploads or automatic CV conversion.</b> Existing notes and attachments remain.'),
+    p('Acceptance report', 'h'),
+    p('Report version and enabled status, three-skill discovery, duplicate cleanup, direct updater result, hook trust/lifecycle, fictional CV review, private Excel setup and Trello read access separately. Do not claim a real Excel write passed without an authorised candidate ranking and read-back verification. Identify any pending setup; do not create fake candidates or cards.'),
 ]
 
 owner = [
-    p('Owner onboarding checklist', 'title'),
-    p('For Keyan FEILI. Use with BTO_CV_Team_Setup.pdf. Verify on one colleague\'s account before wider rollout.', 'sub'),
-    p('1. Confirm the release and access', 'h'),
-    p('Confirm main contains the intended tested release. The refreshed marketplace manifest is the version authority; compare the installed version with it. Confirm the repository access settings and invite colleagues if needed. Ask them to verify access using their own accounts.'),
-    p('For a personal private repository, collaborators can have write access. The instruction to contact Keyan for shared changes is workflow guidance, not access enforcement. Manage invitations and remove access when no longer needed.'),
-    p('2. Confirm the supported local environment', 'h'),
-    p('Use a local Codex environment with command execution and plugin support. Python 3, Git and a plugin-capable Codex CLI must resolve in the hook environment. Verify Git credentials non-interactively. Prefer Microsoft Word for CV rendering on Windows. Required CV fonts are Century Gothic and Wingdings.'),
-    p('The team guide shows the optional Approve for me permission mode. It routes eligible requests to automatic review; it does not guarantee approval or replace sign-in and hook trust. If unavailable or restricted, use Ask for approval.'),
-    p('3. Run the separate-account pilot', 'h'),
-    p('Have one colleague follow both pages of the team guide. Confirm all of the following:'),
-    p('<b>Installation:</b> one active BTO plugin is enabled, with version matching the refreshed marketplace plugin.json. Resolve any old standalone copy only after verification.'),
-    p('<b>Updater:</b> the installed hooks/update.py --force --check returns current or updated. Its state in PLUGIN_DATA records ok: true. This proves script success, not lifecycle execution.'),
-    p('<b>Trust and lifecycle:</b> the colleague reviews the current hook definition in a supported review control. Start/resume a new local session and verify the hook ran from the host\'s hook execution evidence. Recent state may cause a silent throttled run; state alone does not prove a new invocation. If the host provides no evidence, mark lifecycle verification pending.'),
-    p('<b>Document:</b> create the fictional sample in a fresh chat. Inspect editable text, the R.R./A.F.R. banner/layout, native square lists and every rendered page. Each Main responsibilities: label uses 1.5-line spacing; bullets keep their existing spacing.'),
-    p('The team guide can be shared for the pilot. Treat wider rollout as ready only after installation, updater, trusted lifecycle execution and document checks pass on that colleague\'s machine.'),
+    p('BTO HR owner checklist', 'title'),
+    p('For Keyan FEILI. Use with BTO_HR_Team_Setup.pdf. Pilot on a colleague\'s own account.', 'sub'),
+    p('1. Release and permissions', 'h'),
+    p('Confirm main contains the tested release and plugin.json names bto-hr. Keep the existing repository URL and bto-cv-marketplace registration. Verify all three packaged skills: bto-cv, score and trello. Provide repository access if needed; separately provide the approved Excel link and Trello board access. A plugin install grants none of these permissions.'),
+    p('2. Installation and migration', 'h'),
+    p('Have a colleague drop the team PDF into a local Codex chat and send its setup message. Confirm enabled version matches the refreshed manifest. Migrate bto-cv only after BTO HR works; preserve private Excel configuration first. Archive standalone Score/Talent Pool duplicates outside discovery. In a fresh chat, confirm only the three repository HR skills appear, alongside any unrelated installed tools.'),
+    p('3. Verify each capability separately', 'h'),
+    p('<b>Updater:</b> installed hooks/update.py --force --check returns current or updated. Verify trusted SessionStart execution separately; direct execution does not prove hook lifecycle success.'),
+    p('<b>CV:</b> convert the fictional sample; inspect all rendered pages, editable content, banner, native square bullets and 1.5-line spacing on Main responsibilities labels. Disclose missing fonts or rendering limits.'),
+    p('<b>Score:</b> use fictional local assessment data to verify independent JD scores, language flags and the 0-5 employer bonus. Confirm Excel access and private destination setup. Test real writes only with an authorised candidate batch; verify the >=80 boundary, correct existing sheet, duplicate handling, blanks and preservation of colleague columns. No qualifying candidate means no workbook change.'),
+    p('<b>Trello:</b> verify authenticated board/list/label access without writing sample cards. For the first authorised batch, verify title, profile fields, list and seniority. Confirm uploads and mandatory CV conversion are absent; preserve existing content.'),
+    p('Acceptance', 'h'),
+    p('Record pass, pending or blocked for each item. Full setup is verified only when its required checks pass on the colleague\'s machine. Do not equate repository publication with installation or service access.'),
     PageBreak(),
     p('Updates and recovery', 'title'),
-    p('Keep the release central and make failures diagnosable without disrupting CV work.', 'sub'),
-    p('4. Confirm a real version upgrade', 'h'),
-    p('At the next tested release, confirm the colleague\'s trusted hook updates BTO after the daily interval, or test the updater directly with --force --check. Verify the installed version equals the refreshed manifest, then open a new chat. Record lifecycle evidence separately from a forced script check.'),
-    p('5. Handle update failures', 'h'),
-    p('A failed check must leave the installed package available. Conversion uses its paired local master and generator; it does not fetch a newer template or require fallback approval. After restoring connectivity/access, refresh and inspect:'),
-    command('codex plugin marketplace upgrade bto-cv-marketplace'),
-    command('codex plugin list --marketplace bto-cv-marketplace --json'),
-    p('Compare with the refreshed plugin.json. Only if installation is missing or still behind:'),
-    command('codex plugin add bto-cv@bto-cv-marketplace --json'),
-    p('Verify enabled status and version again, and start a new chat. If the updater fails, inspect the failing stage, CLI access, Git credentials and interpreter paths. Do not delete credentials, uninstall a working package, bypass hook trust or create another BTO copy.'),
-    p('6. Maintain future releases', 'h'),
-    p('Edit the repository, not the installed cache. Preserve the R.R./A.F.R. master and content rules. Run the relevant tests; render and inspect fictional output for formatting changes. Bump plugin.json for package changes, publish the tested release, and keep these guides consistent.'),
+    p('Keep the shared package current without losing private configuration.', 'sub'),
+    p('4. Maintain the release', 'h'),
+    p('Edit the repository, not installed caches. Preserve CV layout and factual wording rules. Bump plugin.json for package changes and rebuild these guides. Run both suites and the CV input check:'),
     command('python -m unittest discover -s tests -v'),
-    p('Current conversion: extract once, reconcile source facts and the complete IT-skills inventory, then use scripts/convert.py to build and structurally verify. Visual review remains separate. Skills intentionally appear under both experience and IT SKILLS; at most four skill groups. Never commit candidate files or private reconciliation data.'),
-    p('Update behavior', 'h'),
-    p('SessionStart checks occur at startup/resume, at most once per 24 hours. Failed checks retry no sooner than one hour. This is not a background timer. Package updates need a fresh chat; changed hooks may require renewed trust. Existing CV files are unchanged.'),
+    command('python -m unittest discover -s skills/score/tests -v'),
+    command('python skills/bto-cv/scripts/build_docx.py skills/bto-cv/references/input-example.json --check'),
+    command('python docs/build_guides.py'),
+    p('Render and inspect every onboarding page before publishing. Never commit private workbook configuration, candidate CVs, rankings or reconciliation data. The guides contain no private workbook link.'),
+    p('5. Refresh an installation', 'h'),
+    p('Preserve references/workbook.local.json from the installed Score skill before an upgrade; alternatively use the privately configured SCORE_WORKBOOK_URL. Restore and verify the destination after the package changes.'),
+    command('codex plugin marketplace upgrade bto-cv-marketplace'),
+    command('codex plugin add bto-hr@bto-cv-marketplace --json'),
+    command('codex plugin list --marketplace bto-cv-marketplace --json'),
+    p('Compare the enabled installed version with the refreshed manifest. Start a new chat; changed hooks may need renewed review. SessionStart checks occur at most daily; failures retry at a later startup/resume after at least one hour. This is not a background timer.'),
+    p('6. Handle failures without discarding working setup', 'h'),
+    p('Check Git access, Python, Codex CLI and supported sign-in flows. Do not delete credentials or bypass hook trust. CV conversion can use the last verified template/generator pair offline. Excel/Trello failures must be reported separately; do not claim writes succeeded or upload local replacements. Preserve completed local rankings when sync is blocked.'),
     p('References', 'h'),
-    p('<link href="https://github.com/KeyanFEILI/BTO-CV" color="#00665F">BTO repository and current README</link><br/><link href="https://developers.openai.com/plugins/build/plugins" color="#00665F">Official OpenAI marketplace and hook-trust documentation</link>', 'small'),
+    p('<link href="https://github.com/KeyanFEILI/BTO-CV" color="#00665F">BTO HR repository and current README</link><br/><link href="https://developers.openai.com/plugins/build/plugins" color="#00665F">Official OpenAI plugin documentation</link>', 'small'),
 ]
 
 if __name__ == '__main__':
-    build('BTO_CV_Team_Setup.pdf', team)
-    build('BTO_CV_Owner_Checklist.pdf', owner)
+    build('BTO_HR_Team_Setup.pdf', team)
+    build('BTO_HR_Owner_Checklist.pdf', owner)
