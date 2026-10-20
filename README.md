@@ -2,7 +2,7 @@
 
 Convert an original PDF or Word CV into an editable BTO Word document in English, using the bundled R.R./A.F.R. master, Century Gothic typography and native square bullet lists.
 
-Version **3.5.0** adds the `score` skill for JD-specific rankings and shared Excel shortlists. It also requires every source or user-approved skill to remain in IT SKILLS even when repeated under experience, with an inventory check before delivery. It retains the streamlined build-and-verify command and unchanged Word layout, including 1.5-line spacing on each “Main responsibilities:” label. Wording stays unchanged unless translation or necessary cleanup is required. Candidate facts and documents are never repository fixtures.
+Version **3.6.0** bundles BTO CV conversion, `score` for JD-specific rankings and shared Excel shortlists, and `bto-talent-pool` for Trello cards without file uploads. It also requires every source or user-approved skill to remain in IT SKILLS even when repeated under experience, with an inventory check before delivery. It retains the streamlined build-and-verify command and unchanged Word layout, including 1.5-line spacing on each “Main responsibilities:” label. Wording stays unchanged unless translation or necessary cleanup is required. Candidate facts and documents are never repository fixtures.
 
 ## Install and update
 
@@ -52,6 +52,20 @@ Configure the workbook with `SCORE_WORKBOOK_URL` or a private, ignored
 Colleagues need their own existing workbook access. The agent verifies writes and
 reports sign-in/access blockers; it never replaces the shared file with a local
 copy. See [the shared-workbook workflow](skills/score/references/shared-workbook.md).
+
+## Trello Talent Pool
+
+Use `$bto-talent-pool` with candidate CVs to create or update cards on the BTO
+Talent Pool board. It checks for duplicates, fills factual profile fields, chooses
+the appropriate role list and applies one supported seniority label. Client
+opportunity copies require a user request and retain the pool original.
+
+File uploads are excluded: the skill does not upload originals or BTO CVs, and
+card creation does not require a document conversion. Existing attachments and
+colleague notes are preserved. BTO CV conversion remains available separately.
+Users need an authenticated Trello connection and access to the board; installing
+the skill does not grant access or create cards. See the
+[Trello skill](skills/bto-talent-pool/SKILL.md) for the card conventions.
 
 ## Verification and maintenance
 
