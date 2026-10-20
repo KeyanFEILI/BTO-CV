@@ -16,4 +16,5 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m unittest discover -s tests -v
+      - run: python -m unittest discover -s skills/score/tests -v
       - run: python skills/bto-cv/scripts/build_docx.py skills/bto-cv/references/input-example.json --check

@@ -1,0 +1,103 @@
+{
+  "jobs": [
+    {
+      "id": "jd-1",
+      "title": "Example Software Engineer",
+      "criteria": [
+        {
+          "id": "core",
+          "kind": "skills",
+          "text": "Production Python development",
+          "weight": 40,
+          "required": true
+        },
+        {
+          "id": "delivery",
+          "kind": "delivery",
+          "text": "Automated testing and reliable delivery",
+          "weight": 30,
+          "required": true
+        },
+        {
+          "id": "scope",
+          "kind": "experience",
+          "text": "Independent feature delivery",
+          "weight": 15,
+          "required": true
+        },
+        {
+          "id": "sector",
+          "kind": "sector",
+          "text": "Banking projects (desirable)",
+          "weight": 10,
+          "required": false
+        }
+      ],
+      "languages": [
+        {
+          "id": "english",
+          "condition": "English C1 required",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "name": "Example Candidate",
+      "latest_location": "",
+      "phone": "",
+      "email": "",
+      "source_languages": "English: level unspecified"
+    }
+  ],
+  "assessments": [
+    {
+      "jd_id": "jd-1",
+      "candidate_id": "candidate-1",
+      "ratings": {
+        "core": {
+          "status": "met",
+          "rating": 1,
+          "reason": "Direct production Python evidence.",
+          "evidence": [
+            "example-cv.pdf p.1: Built production services in Python."
+          ]
+        },
+        "delivery": {
+          "status": "partial",
+          "rating": 0.5,
+          "reason": "Testing evidenced; release responsibility unclear.",
+          "evidence": [
+            "example-cv.pdf p.1: Wrote unit tests."
+          ]
+        },
+        "scope": {
+          "status": "met",
+          "rating": 1,
+          "reason": "Independent feature ownership evidenced.",
+          "evidence": [
+            "example-cv.pdf p.1: Owned features from design to release."
+          ]
+        },
+        "sector": {
+          "status": "unknown",
+          "rating": 0,
+          "reason": "Banking sector is not stated.",
+          "evidence": []
+        }
+      },
+      "languages": {
+        "english": {
+          "status": "unknown",
+          "note": "English listed, but no level supplied.",
+          "evidence": []
+        }
+      },
+      "employers": [],
+      "relevant_experience": "Cannot determine",
+      "short_description": "Python feature delivery evidenced; testing scope partially evidenced and banking experience unspecified."
+    }
+  ]
+}

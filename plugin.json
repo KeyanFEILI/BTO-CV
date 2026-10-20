@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "bto-cv",
-  "version": "3.4.1",
-  "description": "Convert original CVs into editable BTO Word documents using the shared R.R./A.F.R. layout and its native square bullet lists.",
+  "version": "3.5.0",
+  "description": "Convert original CVs into editable BTO Word documents and rank candidates against job descriptions with evidence-based scores.",
   "author": {
     "name": "Keyan FEILI"
   },
@@ -15,10 +15,11 @@
         "category": "Productivity",
         "defaultPrompt": [
           "Convert the attached original CV into an editable BTO Word document in English, preserving wording except for necessary translation and cleanup.",
-          "Create a fictional BTO Word CV to test the formatting and native bullet lists."
+          "Create a fictional BTO Word CV to test the formatting and native bullet lists.",
+          "Use $score to rank the attached CVs against each job description and update my configured shared Excel shortlist for candidates scoring at least 80/100."
         ],
         "brandColor": "#00665E",
-        "longDescription": "Create an editable .docx using the BTO reference banner, Century Gothic fonts, measured spacing and native square bullet lists. Preserves supplied facts. Includes a deterministic Word generator and optional HTML preview."
+        "longDescription": "Create an editable .docx using the BTO reference banner, Century Gothic fonts, measured spacing and native square bullet lists. Preserves supplied facts. Includes a deterministic Word generator and optional HTML preview. Includes Score for JD-specific candidate rankings, language flags and shared Excel shortlists."
       },
       "hooks": "./hooks/hooks.json"
     }

@@ -3,3 +3,6 @@ __pycache__/
 work/
 outputs/
 candidate*.json
+
+# Private shared workbook destinations
+**/workbook.local.json

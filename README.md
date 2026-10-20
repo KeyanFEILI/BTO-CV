@@ -2,7 +2,7 @@
 
 Convert an original PDF or Word CV into an editable BTO Word document in English, using the bundled R.R./A.F.R. master, Century Gothic typography and native square bullet lists.
 
-Version **3.4.1** requires every source or user-approved skill to remain in IT SKILLS even when repeated under experience, with an inventory check before delivery. It retains the streamlined build-and-verify command and unchanged Word layout, including 1.5-line spacing on each “Main responsibilities:” label. Wording stays unchanged unless translation or necessary cleanup is required. Candidate facts and documents are never repository fixtures.
+Version **3.5.0** adds the `score` skill for JD-specific rankings and shared Excel shortlists. It also requires every source or user-approved skill to remain in IT SKILLS even when repeated under experience, with an inventory check before delivery. It retains the streamlined build-and-verify command and unchanged Word layout, including 1.5-line spacing on each “Main responsibilities:” label. Wording stays unchanged unless translation or necessary cleanup is required. Candidate facts and documents are never repository fixtures.
 
 ## Install and update
 
@@ -31,12 +31,35 @@ Conversion uses the template and generator from the **same installed release**. 
 
 The complete content contract is in [content.md](skills/bto-cv/references/content.md); the measured layout is in [format.md](skills/bto-cv/references/format.md). The agent extracts and reconciles source content once, prepares private UTF-8 JSON, validates it, builds the document, verifies it and inspects its rendered pages. JSON is an internal step, not a user requirement.
 
+## Candidate scoring and shared Excel
+
+Use `$score` with one or more JDs and multiple CVs. Each JD gets a separate
+ranking with weights adapted to its requirements: 95 role-fit points plus up to
+5 for relevant large-company/consulting experience. Required-language gaps are
+flagged without changing the score. Every candidate entry includes full name,
+latest stated location, relevant years, short description, phone, email and
+languages; missing details are never invented.
+
+Every ranking also updates the user's configured shared Excel workbook when
+accessible. Only final scores **>=80/100** qualify for Excel; the chat still lists
+all candidates. Match the JD to an existing role sheet. Create a sheet for an
+unrelated role using the JD title and the existing headers. Repeated candidates
+update their existing row, missing details stay blank, and colleague-managed
+fields are preserved. No background process or workbook access is installed.
+
+Configure the workbook with `SCORE_WORKBOOK_URL` or a private, ignored
+`skills/score/references/workbook.local.json` containing `{"url": "your sharing link"}`.
+Colleagues need their own existing workbook access. The agent verifies writes and
+reports sign-in/access blockers; it never replaces the shared file with a local
+copy. See [the shared-workbook workflow](skills/score/references/shared-workbook.md).
+
 ## Verification and maintenance
 
 Run these from the repository with Python 3:
 
 ```sh
 python -m unittest discover -s tests -v
+python -m unittest discover -s skills/score/tests -v
 python skills/bto-cv/scripts/build_docx.py skills/bto-cv/references/input-example.json --check
 ```
 
