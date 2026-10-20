@@ -17,14 +17,11 @@ to retain source-reconciled contacts, languages, dated roles and evidence refere
 Do not conflate identical extraction with proof that two different people are one.
 OCR/manual corrections belong in the reconciled profile with source references.
 
-`assessment_key(job, source_key, employer_register, as_of)` covers the frozen
-rubric/context, reconciled profile, employer register, ISO assessment date and
-calculator version. Use `read(key)` / `write(key, {"assessment": assessment})` to
-reuse unchanged pairs. Changes invalidate only affected pairs. Metadata-only
-workbook edits need no re-extraction or reassessment. Merge cached and changed
-assessments into one complete JSON before running `rank.py`; it still validates
-coverage of every supplied candidate/JD pair. Cache reuse never substitutes for
-source reconciliation, an employer classification check or duration calculations.
+Reuse unchanged assessments from the private assessment JSON. Reassess affected
+pairs only when their JD/rubric, source/profile, employer classification or relevant
+date changes. Workbook-only edits need no reassessment. Keep all pairs in the
+JSON passed to `rank.py`, which validates complete coverage. A separate
+assessment-cache framework is not required.
 
 ## Context and recommendation consistency
 

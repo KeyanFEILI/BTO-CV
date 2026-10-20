@@ -121,10 +121,6 @@ schema. Prefer `scripts/workbook_plan.py` when a table snapshot is available;
 it matches identities and emits only changed adjacent ranges, with before-values
 for conflict detection. It never modifies a workbook itself.
 
-Prepare the Excel projection once with `scripts/workbook_rows.py` using final
-ranking JSON and observed headers; it omits missing columns without changing the
-schema. Match identities and row destinations before applying its values. The
-helper does not access Excel or decide whether a CV supports a rating.
 
 Batch reads and writes through the connected workbook tool when available; cache
 sheet names, headers and format observations for this run. In Excel web, prefer

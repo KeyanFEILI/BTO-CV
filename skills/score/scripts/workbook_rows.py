@@ -1,21 +1,13 @@
 #!/usr/bin/env python3
-"""Project final rankings onto observed headers; never create workbook columns.
+"""Existing-header projection shared by workbook_plan.py and its tests.
 
-Usage: workbook_rows.py ranking.json headers.json rows.json
-headers.json is the exact existing header row, as a JSON list of strings.
-Output rows contain only supported non-empty fields, keyed by existing headers.
-Resolve candidate identities/row destinations and inspect number formats before
-applying this projection with a connected workbook tool or normal Excel UI.
+Only non-empty supported fields are projected. Manual columns and posting-pool
+ranks are preserved. Use workbook_plan.py as the single export command.
 """
-import argparse
-import json
-from pathlib import Path
-
 from rank import experience_label, require
 
 
 FIELDS = {
-    'rank': ('rank',),
     'candidate': ('candidate', 'full name', 'candidate name', 'name'),
     'score': ('match', 'score', 'score /100'),
     'latest_location': ('latest location', 'location'),
@@ -40,7 +32,7 @@ def columns(headers):
     return mapping
 
 
-def project(jobs, headers, *, selected_ids=(), write_batch_ranks=False):
+def project(jobs, headers, *, selected_ids=()):
     require(isinstance(jobs, list), 'ranking must be a list of job results')
     mapping = columns(headers)
     selected_ids = set(selected_ids)
@@ -56,8 +48,6 @@ def project(jobs, headers, *, selected_ids=(), write_batch_ranks=False):
             experience_label(row.get('relevant_experience', ''))
             values = {}
             for field, header in mapping.items():
-                if field == 'rank' and not write_batch_ranks:
-                    continue  # Do not replace whole-pool ranks with a batch rank.
                 value = row.get(field, '')
                 if value is None or (isinstance(value, str)
                                      and value.strip().casefold() in MISSING):
@@ -71,26 +61,3 @@ def project(jobs, headers, *, selected_ids=(), write_batch_ranks=False):
         output.append({'jd_id': job['jd_id'], 'title': job['title'], 'rows': rows,
                        'omitted_fields': [f for f in FIELDS if f not in mapping]})
     return output
-
-
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('ranking', type=Path)
-    parser.add_argument('headers', type=Path)
-    parser.add_argument('output', type=Path)
-    parser.add_argument('--selected-id', action='append', default=[],
-                        help='Only use for candidates explicitly selected by the user; overrides 80 threshold')
-    args = parser.parse_args()
-    try:
-        jobs = json.loads(args.ranking.read_text(encoding='utf-8-sig'))
-        headers = json.loads(args.headers.read_text(encoding='utf-8-sig'))
-        result = project(jobs, headers, selected_ids=args.selected_id)
-        with args.output.open('x', encoding='utf-8') as target:
-            json.dump(result, target, ensure_ascii=False, indent=2, allow_nan=False)
-    except (ValueError, OSError, TypeError, KeyError) as error:
-        parser.exit(1, str(error) + '\n')
-    print(f'Prepared {sum(len(j["rows"]) for j in result)} rows; headers unchanged')
-
-
-if __name__ == '__main__':
-    main()

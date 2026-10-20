@@ -16,7 +16,7 @@ Use `scripts/evidence_cache.py TASK_CACHE SOURCE...` in a private task-local
 folder to extract each distinct attachment once through `extract_text.py`. Reuse
 the cached text and reconciled profile across JDs; do not re-extract on a wording
 or workbook-only revision. See [workflow.md](references/workflow.md) for cache
-keys, changed-assessment reuse and range-write planning. Inspect unreadable pages, tables and
+reuse and range-write planning. Inspect unreadable pages, tables and
 relevant headers/images separately; OCR when available. Ask only about material
 ambiguity, conflicting identity or unreadable content. Do not send CVs to web
 search or other services to research a candidate.
@@ -96,7 +96,8 @@ python scripts/rank.py assessment.json ranking.json
 The standard-library calculator validates complete coverage, evidence, weights,
 language flags and bonus limits, then calculates and ranks; it does not read CVs
 or decide whether evidence supports a claim. Reconcile the assessments yourself
-before running it. Use its totals and order unchanged. Contextual recommendations must follow the
+before running it. Use its totals and order unchanged. Contextual recommendations
+must follow the
 same ranking (`recommended_candidate_ids`), with unresolved prerequisites stated
 separately. If contextual reasoning changes the interpretation, revise the rubric
 for everyone and recalculate; do not name a different best match after scoring or

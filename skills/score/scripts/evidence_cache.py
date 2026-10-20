@@ -7,7 +7,6 @@ Prints only cache keys and reuse status, never CV text or contact details.
 import argparse
 import hashlib
 import json
-from datetime import date
 from pathlib import Path
 
 from extract_text import extract
@@ -71,15 +70,6 @@ class EvidenceCache:
         record['profile'] = profile
         self.write(source_key, record)
 
-    def assessment_key(self, job, source_key, employer_register, as_of):
-        # Include reconciled profile corrections, rubric, register and date.
-        date.fromisoformat(as_of)
-        source = self.read(source_key)
-        if source is None or source.get('profile') is None:
-            raise ValueError('Reconcile a candidate profile before caching assessments')
-        return fingerprint(dict(job=job, source=source, employers=employer_register,
-                                as_of=as_of,
-                                calculator=digest(Path(__file__).with_name('rank.py').read_bytes())))
 
 
 def main():

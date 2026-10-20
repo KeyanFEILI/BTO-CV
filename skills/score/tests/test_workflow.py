@@ -1,6 +1,5 @@
 """Fictional behavior tests for caching, contextual scoring and range plans."""
 import copy
-import importlib.util
 import json
 from pathlib import Path
 import sys
@@ -30,17 +29,14 @@ class CacheTests(unittest.TestCase):
                 self.assertTrue(cache.source(source)[2])
                 self.assertEqual(extractor.call_count, 1)
                 cache.save_profile(key, {'name': 'Example', 'roles': []})
-                old = cache.assessment_key({'id': 'one'}, key, {}, '2026-01-01')
-                cache.write(old, {'assessment': {'ratings': 'fictional'}})
-                self.assertIsNotNone(cache.read(old))
-                for job, employers, day in [({'id': 'two'}, {}, '2026-01-01'),
-                                             ({'id': 'one'}, {'new': 'classification'}, '2026-01-01'),
-                                             ({'id': 'one'}, {}, '2026-01-02')]:
-                    self.assertNotEqual(cache.assessment_key(job, key, employers, day), old)
+                self.assertEqual(cache.source(source)[1]['profile']['name'], 'Example')
                 cache.save_profile(key, {'name': 'Corrected Example', 'roles': []})
-                self.assertNotEqual(cache.assessment_key({'id': 'one'}, key, {}, '2026-01-01'), old)
+                self.assertEqual(cache.source(source)[1]['profile']['name'], 'Corrected Example')
                 source.write_text('Revised fictional CV', encoding='utf-8')
-                self.assertNotEqual(cache.source(source)[0], key)
+                revised_key, revised, reused = cache.source(source)
+                self.assertNotEqual(revised_key, key)
+                self.assertIsNone(revised['profile'])
+                self.assertFalse(reused)
                 self.assertEqual(extractor.call_count, 2)
 
     def test_cache_key_cannot_escape_private_folder(self):
