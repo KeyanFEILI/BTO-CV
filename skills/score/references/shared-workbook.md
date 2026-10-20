@@ -79,9 +79,13 @@ experience cannot be determined, leave XP blank rather than inventing a value.
 
 Reuse the exact candidates, scores, JD-specific experience and descriptions from
 the delivered list. No second extraction or scoring pass is needed. Only candidates
-with a final score >=80/100 (including exactly 80) are eligible for Excel writes;
-use the unrounded calculator score, including its employer bonus. Do not add or
-update rows for candidates below 80, and do not delete their pre-existing rows.
+with a final score >=80/100 (including exactly 80) are eligible by default;
+an explicit user selection overrides the threshold for the named candidates only.
+Use `--selected-id` only for this explicit selection and record it privately.
+Never inflate scores or silently lower the threshold. For automatic exports,
+use the unrounded calculator score, including its employer bonus. Without an
+explicit selection, do not add or update rows below 80. Never delete their
+pre-existing rows.
 The chat ranking still includes all candidates with their explanations. Write
 every eligible listed candidate, not only the top five. If none qualifies, report
 that no candidate met the Excel threshold and leave the workbook unchanged,
@@ -111,6 +115,11 @@ the full posting pool only when its assessments are available under the same JD
 rubric; never invent scores for existing unassessed candidates.
 
 ## Efficient writes and verification
+
+Read [workflow.md](workflow.md) for the complete batch planner and snapshot
+schema. Prefer `scripts/workbook_plan.py` when a table snapshot is available;
+it matches identities and emits only changed adjacent ranges, with before-values
+for conflict detection. It never modifies a workbook itself.
 
 Prepare the Excel projection once with `scripts/workbook_rows.py` using final
 ranking JSON and observed headers; it omits missing columns without changing the

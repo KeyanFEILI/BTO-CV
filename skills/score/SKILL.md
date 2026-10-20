@@ -12,8 +12,11 @@ do not reject, submit, contact or change candidate records unless asked.
 
 ## Prepare once
 
-Extract each attachment once with `scripts/extract_text.py` into a private,
-task-local UTF-8 file; reuse it across JDs. Inspect unreadable pages, tables and
+Use `scripts/evidence_cache.py TASK_CACHE SOURCE...` in a private task-local
+folder to extract each distinct attachment once through `extract_text.py`. Reuse
+the cached text and reconciled profile across JDs; do not re-extract on a wording
+or workbook-only revision. See [workflow.md](references/workflow.md) for cache
+keys, changed-assessment reuse and range-write planning. Inspect unreadable pages, tables and
 relevant headers/images separately; OCR when available. Ask only about material
 ambiguity, conflicting identity or unreadable content. Do not send CVs to web
 search or other services to research a candidate.
@@ -24,7 +27,14 @@ Do not merge different people. Use unique IDs and preserve names and accents.
 
 Read [rubric.md](references/rubric.md) before assessment and
 [input-example.json](references/input-example.json) for the calculation schema.
-For each JD, freeze criteria and weights before evaluating candidates. Allocate
+For each JD, write its actual purpose and expected outcomes into `context`, with
+JD evidence. Classify each criterion as `core`, `prerequisite` or `preferred` and
+record its JD evidence and accepted equivalents before seeing candidate ratings.
+Weight recurring responsibilities, delivery ownership, operating environment and
+scale according to the role; avoid turning every named tool into an equally
+weighted standalone requirement. Keep explicitly required certifications, versions
+and tenure visible as prerequisites; do not assume equivalence.
+Freeze criteria and weights before evaluating candidates. Allocate
 95 points to job-specific role fit, plus up to 5 employer-bonus points. Required
 skills receive more weight than nice-to-haves. Do not silently change the rubric
 to favour a candidate; any correction applies to everyone for that JD.
@@ -86,7 +96,14 @@ python scripts/rank.py assessment.json ranking.json
 The standard-library calculator validates complete coverage, evidence, weights,
 language flags and bonus limits, then calculates and ranks; it does not read CVs
 or decide whether evidence supports a claim. Reconcile the assessments yourself
-before running it. Use its totals and order unchanged. Equal scores share a rank
+before running it. Use its totals and order unchanged. Contextual recommendations must follow the
+same ranking (`recommended_candidate_ids`), with unresolved prerequisites stated
+separately. If contextual reasoning changes the interpretation, revise the rubric
+for everyone and recalculate; do not name a different best match after scoring or
+raise scores merely to meet the Excel threshold. Report missing evidence
+(`uncertainty.unknown_weight`) separately from confirmed shortfalls and give a
+short, actionable validation list from `points_to_validate`. These do not change
+scores or act as hidden tie-breakers. Equal scores share a rank
 and retain input order; do not invent a preference between ties. Never describe
 the score as a hiring probability or a definitive judgment of competence.
 
@@ -106,7 +123,9 @@ With multiple JDs, repeat the ranking per JD rather than pooling scores across
 different rubrics. Default to English and concise chat output. Every time a JD
 candidate ranking is delivered, also update the configured shared workbook using
 [shared-workbook.md](references/shared-workbook.md). This is the default output,
-not an optional export. Export only final scores >=80/100; keep the full chat
+not an optional export. Export final scores >=80/100 by default; an explicit user
+selection may override the threshold for those named candidates only. Record the
+override privately and preserve the actual score. Keep the full chat
 ranking. Match the JD to an existing role sheet before creating any new sheet.
 Never add, rename or reorder headers on existing sheets. New sheets for unrelated
 roles must copy existing headers exactly. Missing columns are omitted from Excel;

@@ -71,6 +71,12 @@ def rank(data):
     for job in jobs.values():
         require(text(job.get('title')), 'JD title missing')
         criteria = indexed(job.get('criteria'), 'criteria')
+        contextual = 'context' in job
+        if contextual:
+            context = job['context']
+            require(isinstance(context, dict) and text(context.get('purpose'))
+                    and evidence(context.get('evidence')),
+                    'Job context needs its purpose and JD evidence')
         for criterion in criteria.values():
             require(text(criterion.get('text')), 'Criterion text missing')
             weight = criterion.get('weight')
@@ -78,6 +84,14 @@ def rank(data):
             require(type(criterion.get('required', False)) is bool, 'required must be boolean')
             require(criterion.get('kind') in ('skills', 'delivery', 'experience', 'sector'),
                     'Criterion kind must be skills, delivery, experience or sector; no language/employer criteria')
+            if contextual:
+                require(criterion.get('priority') in ('core', 'prerequisite', 'preferred'),
+                        'Context criteria need core/prerequisite/preferred priority')
+                require(evidence(criterion.get('jd_evidence')),
+                        'Context criteria need JD evidence')
+                require(isinstance(criterion.get('accepted_equivalents', []), list)
+                        and all(text(v) for v in criterion.get('accepted_equivalents', [])),
+                        'accepted_equivalents must be a list of explicit interpretations')
         require(sum(c['weight'] for c in criteria.values()) == 95, 'JD weights must total 95')
         languages = job.get('languages', [])
         require(isinstance(languages, list), 'JD languages must be a list')
@@ -104,6 +118,7 @@ def rank(data):
         require(isinstance(ratings, dict), 'ratings must be an object')
         require(set(ratings) == {c['id'] for c in job['criteria']}, 'Incomplete criterion ratings')
         core, coverage, details = 0, 0, []
+        unknown_weight, confirmed_gap_points = 0, 0
         for criterion in job['criteria']:
             item = ratings[criterion['id']]
             require(isinstance(item, dict), 'Invalid rating')
@@ -113,11 +128,24 @@ def rank(data):
             require(text(item.get('reason')), 'Every rating needs a reason')
             require(status == 'unknown' or evidence(item.get('evidence')),
                     'Supported ratings need CV evidence; otherwise use unknown')
+            basis = item.get('match_basis', 'direct')
+            if 'context' in job and status in ('met', 'partial'):
+                require(basis in ('direct', 'equivalent', 'adjacent'), 'Invalid match_basis')
+                if basis == 'equivalent':
+                    require(text(item.get('equivalence_reason'))
+                            and item.get('equivalent') in criterion.get('accepted_equivalents', []),
+                            'Equivalent evidence needs a frozen accepted equivalent and explanation')
+                require(not (basis == 'adjacent' and value > .5),
+                        'Adjacent evidence cannot establish a strong/full direct match')
             points = criterion['weight'] * value
             core += points
             coverage += criterion['weight'] if status != 'unknown' else 0
+            unknown_weight += criterion['weight'] if status == 'unknown' else 0
+            confirmed_gap_points += criterion['weight'] if status == 'not_met' else 0
             details.append(dict(criterion_id=criterion['id'], criterion=criterion['text'],
                                 required=criterion.get('required', False), status=status,
+                                priority=criterion.get('priority', 'core' if criterion.get('required') else 'preferred'),
+                                match_basis=basis,
                                 points=points, lost_points=criterion['weight'] - points,
                                 reason=item['reason'], evidence=item.get('evidence', [])))
         checks = assessment.get('languages', {})
@@ -142,6 +170,12 @@ def rank(data):
                                     ('relevant_experience', 'short_description')},
                                  score=core + extra, core=core, employer_bonus=extra,
                                  evidence_coverage_pct=round(100 * coverage / 95, 1),
+                                 uncertainty=dict(unknown_weight=unknown_weight,
+                                                  confirmed_gap_points=confirmed_gap_points),
+                                 points_to_validate=[dict(criterion=x['criterion'], status=x['status'],
+                                                          priority=x['priority'], reason=x['reason'])
+                                                     for x in details if x['status'] != 'met'
+                                                     and x['priority'] != 'preferred'],
                                  languages=flags, criteria=details,
                                  biggest_gaps=sorted((x for x in details if x['lost_points']),
                                                      key=lambda x: -x['lost_points'])[:3]))
@@ -155,7 +189,10 @@ def rank(data):
             if row['score'] != previous:
                 position, previous = i, row['score']
             row['rank'] = position
-        output.append(dict(jd_id=jid, title=jobs[jid]['title'], ranking=rows))
+        output.append(dict(jd_id=jid, title=jobs[jid]['title'],
+                           context=jobs[jid].get('context', {}),
+                           recommended_candidate_ids=[r['candidate_id'] for r in rows if r['rank'] == 1],
+                           ranking=rows))
     return output
 
 

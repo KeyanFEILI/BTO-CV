@@ -3,7 +3,11 @@
 Convert an original PDF or Word CV into an editable BTO Word document in English, using the bundled R.R./A.F.R. master, Century Gothic typography and native square bullet lists.
 
 Version **4.0.1** preserves existing Excel headers, uses plain experience ranges,
-and validates the Excel projection before writing. It bundles BTO CV conversion, `score` for JD-specific rankings and shared Excel shortlists, and `trello` for Trello cards without file uploads. It also requires every source or user-approved skill to remain in IT SKILLS even when repeated under experience, with an inventory check before delivery. It retains the streamlined build-and-verify command and unchanged Word layout, including 1.5-line spacing on each “Main responsibilities:” label. Wording stays unchanged unless translation or necessary cleanup is required. Candidate facts and documents are never repository fixtures.
+and validates the Excel projection before writing. Context-first criteria keep
+recommendations aligned with scores; a content-addressed cache reuses reconciled
+evidence, and a range planner prepares idempotent workbook updates with conflict
+checks. Direct range writes require a connected Excel session; the planner does
+not provide authentication or cloud access. It bundles BTO CV conversion, `score` for JD-specific rankings and shared Excel shortlists, and `trello` for Trello cards without file uploads. It also requires every source or user-approved skill to remain in IT SKILLS even when repeated under experience, with an inventory check before delivery. It retains the streamlined build-and-verify command and unchanged Word layout, including 1.5-line spacing on each “Main responsibilities:” label. Wording stays unchanged unless translation or necessary cleanup is required. Candidate facts and documents are never repository fixtures.
 
 ## Install and update
 
@@ -42,7 +46,9 @@ latest stated location, relevant years, short description, phone, email and
 languages; missing details are never invented.
 
 Every ranking also updates the user's configured shared Excel workbook when
-accessible. Only final scores **>=80/100** qualify for Excel; the chat still lists
+accessible. Final scores **>=80/100** qualify for automatic Excel export; explicit user
+selection can override this for named candidates without changing their scores.
+The chat still lists
 all candidates. Match the JD to an existing role sheet. Create a sheet for an
 unrelated role using the JD title and the existing headers. Repeated candidates
 update their existing row, missing details stay blank, and colleague-managed

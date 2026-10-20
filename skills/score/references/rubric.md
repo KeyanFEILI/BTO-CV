@@ -10,6 +10,24 @@ experience/seniority 15 and sector/nice-to-haves 10; adapt to the actual JD, wit
 adding requirements it does not contain. Do not score CV design or keyword volume.
 Exclude languages and employer prestige from these 95 points.
 
+## Context before candidate assessment
+
+State the work the client needs done, its operating environment and expected
+outcomes, supported by JD evidence. Group overlapping tool lists under the
+capability they serve. Give comparable credit for documented equivalent delivery
+where the JD allows it, using accepted equivalents frozen in the criterion.
+A strict product/version/certification requirement remains explicit; a related
+certificate or title alone does not prove equivalence. For example, network
+operations ownership and migration/NAC delivery may be more central than a long
+list of product names, while a specific legal/licensing prerequisite stays visible.
+
+Context criteria carry `priority` (`core`, `prerequisite`, `preferred`),
+`jd_evidence` and optional `accepted_equivalents`. A supported rating may set
+`match_basis` to `direct`, `equivalent` or `adjacent`; equivalent matches name the
+frozen `equivalent` and explain `equivalence_reason`. Adjacent evidence cannot
+receive more than 0.5. Do not treat labs, awareness training or operational KPIs
+as equivalent to production ownership, programme coaching or Agile delivery metrics.
+
 Each rating has a status, value, evidence references and a concise reason:
 
 | Status | Rating | Meaning |
@@ -25,7 +43,10 @@ Points = weight × rating. `met`, `partial` and `not_met` require a short CV quo
 and filename/page reference. `unknown` requires an explanation, not fabricated
 negative evidence. Zero for unknown means no demonstrated-match points; it does
 not mean inability. Report weighted evidence coverage alongside major uncertainty.
-Uncertainty should prompt verification, not an automatic hiring decision.
+Uncertainty should prompt verification, not an automatic hiring decision. The
+calculator reports unknown weight separately from confirmed shortfall points,
+and preserves required partial/unknown/not-met items as points to validate.
+Evidence coverage is not confidence, capability or a hiring probability.
 
 Use the same criterion interpretation for all candidates. A listed tool may
 support basic familiarity but not years, production ownership or expert-level
