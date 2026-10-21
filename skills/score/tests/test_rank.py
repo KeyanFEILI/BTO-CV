@@ -62,6 +62,23 @@ class RankingTests(unittest.TestCase):
             for key in ('score', 'core', 'rank', 'employer_bonus', 'evidence_coverage_pct'):
                 self.assertEqual(row[key], expected[key])
 
+    def test_verbose_experience_is_rejected_before_ranking(self):
+        for value in ['Approximately 7-8 years', '12 years, evidenced through May 2024',
+                      '7 years (10 including leadership)']:
+            self.data['assessments'][0]['relevant_experience'] = value
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'plain years'):
+                engine.rank(self.data)
+
+    def test_plain_experience_changes_neither_score_nor_private_notes(self):
+        self.data['private_notes'] = {'duration': 'Snapshot and scope calculations retained here.'}
+        before = copy.deepcopy(self.data)
+        original = engine.rank(self.data)[0]['ranking'][0]
+        self.data['assessments'][0]['relevant_experience'] = '7-8 years'
+        updated = engine.rank(self.data)[0]['ranking'][0]
+        for key in ['score', 'core', 'rank', 'employer_bonus']:
+            self.assertEqual(updated[key], original[key])
+        self.assertEqual(self.data['private_notes'], before['private_notes'])
+
     def test_bonus_cap_and_no_double_counting(self):
         self.assertEqual(engine.bonus([]), 0)
         self.assertEqual(engine.bonus([self.assignment()]), 2.5)

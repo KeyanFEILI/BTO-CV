@@ -9,28 +9,48 @@
           "kind": "skills",
           "text": "Production Python development",
           "weight": 40,
-          "required": true
+          "required": true,
+          "priority": "core",
+          "jd_evidence": [
+            "example-jd.pdf p.1: Production Python development."
+          ],
+          "accepted_equivalents": []
         },
         {
           "id": "delivery",
           "kind": "delivery",
           "text": "Automated testing and reliable delivery",
           "weight": 30,
-          "required": true
+          "required": true,
+          "priority": "core",
+          "jd_evidence": [
+            "example-jd.pdf p.1: Automated testing and reliable delivery."
+          ],
+          "accepted_equivalents": []
         },
         {
           "id": "scope",
           "kind": "experience",
           "text": "Independent feature delivery",
           "weight": 15,
-          "required": true
+          "required": true,
+          "priority": "core",
+          "jd_evidence": [
+            "example-jd.pdf p.1: Independent feature delivery."
+          ],
+          "accepted_equivalents": []
         },
         {
           "id": "sector",
           "kind": "sector",
           "text": "Banking projects (desirable)",
           "weight": 10,
-          "required": false
+          "required": false,
+          "priority": "preferred",
+          "jd_evidence": [
+            "example-jd.pdf p.1: Banking projects (desirable)."
+          ],
+          "accepted_equivalents": []
         }
       ],
       "languages": [
@@ -39,7 +59,13 @@
           "condition": "English C1 required",
           "required": true
         }
-      ]
+      ],
+      "context": {
+        "purpose": "Deliver production software features reliably with independent ownership.",
+        "evidence": [
+          "example-jd.pdf p.1: Own the delivery of tested production software features."
+        ]
+      }
     }
   ],
   "candidates": [
