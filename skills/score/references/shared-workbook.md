@@ -9,7 +9,9 @@ If neither is configured, ask once for the shared workbook link and retain it
 in that private local configuration when authorised. Never guess the destination.
 A colleague must configure their own authorised link; no workbook is bundled.
 
-Update this workbook whenever `score` delivers a JD ranking, including revised
+Only start workbook inspection, planning and writes after sending the chat ranking
+(final scores >=60/100). Continue the update in the same turn without another
+confirmation, then send a separate short Excel status. This also applies to revised
 rankings. This is an in-task update, not a background watcher. Keep the link and
 candidate data private; do not put them in a public repository. Never change
 sharing permissions or send invitations. Other users need their own existing
@@ -63,7 +65,8 @@ Do not repurpose Notes, unused columns or descriptions to bypass this rule.
 For Match, inspect the existing number format: a percentage cell receives
 score/100; a numeric score column receives the /100 number. Never turn 78/100 into
 7800%. Keep the core/bonus breakdown in chat/private notes unless dedicated
-columns already exist; do not append score arithmetic to the short description.
+columns already exist. Descriptions contain fit and gaps only: no score, scoring
+commentary, points, weights, bonuses or calculation details.
 Keep phone and email as literal text, including international prefixes;
 never interpret source text as a formula. Reuse an equivalent existing header
 rather than adding duplicates. Extend native tables over the new rows only;
@@ -86,7 +89,8 @@ Never inflate scores or silently lower the threshold. For automatic exports,
 use the unrounded calculator score, including its employer bonus. Without an
 explicit selection, do not add or update rows below 80. Never delete their
 pre-existing rows.
-The chat ranking still includes all candidates with their explanations. Write
+The chat ranking includes only candidates scoring >=60; retain all assessments
+privately. This display threshold does not change Excel eligibility. Write
 every eligible listed candidate, not only the top five. If none qualifies, report
 that no candidate met the Excel threshold and leave the workbook unchanged,
 including not creating an empty sheet. Missing information means an empty cell,

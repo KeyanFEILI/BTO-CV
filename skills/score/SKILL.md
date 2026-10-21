@@ -78,7 +78,9 @@ phone prefixes, email spelling and every stated language with its actual level.
 Use empty strings for missing details and display “Not provided”; flag conflicts.
 For each JD/candidate assessment, add `relevant_experience` as a concise years
 value or range only, such as `7-8 years`, `12 years` or `10+ years`, and
-`short_description` as a brief fit/gap summary. Never display "approximately",
+`short_description` as a brief fit/gap summary only. Do not mention scores,
+scoring, points, weights, bonuses or calculation details in descriptions, in chat
+or Excel; keep the score in its separate labelled field. Never display "approximately",
 "evidenced through", source snapshot dates or parenthetical scope calculations
 in experience entries, in chat or Excel. Keep those details in private notes.
 Calculate relevant years for that JD from supported role dates, count overlapping
@@ -108,8 +110,11 @@ scores or act as hidden tie-breakers. Equal scores share a rank
 and retain input order; do not invent a preference between ties. Never describe
 the score as a hiring probability or a definitive judgment of competence.
 
-For each JD, show the top five first (or the user's requested number), then the
-remaining candidates if any. Every candidate entry in every JD ranking must show:
+Assess every candidate privately, but include only final scores >=60/100 in the
+chat ranking, using the unrounded total (exactly 60 qualifies). Do not name or
+describe candidates below 60 unless the user explicitly asks for them. Preserve
+the calculator's order and ranks. If none reaches 60, say that no candidate met
+the chat threshold without listing names. Every displayed candidate entry must show:
 full name, latest location, years of relevant experience, short description,
 phone number, email address and languages, plus rank, score /100 and JD language
 flags. Use compact ranked entries with labelled fields to avoid an overly wide
@@ -121,19 +126,23 @@ rankings using their largest weighted gaps and distinguish missing evidence from
 confirmed shortfalls. Mention other explicit must-have gaps independently.
 If all candidates match poorly, say so; do not manufacture a strong shortlist.
 With multiple JDs, repeat the ranking per JD rather than pooling scores across
-different rubrics. Default to English and concise chat output. Every time a JD
-candidate ranking is delivered, also update the configured shared workbook using
+different rubrics. Default to English and concise chat output.
+
+Deliver in two stages. First send the complete filtered ranking in a user-visible
+chat message before any Excel inspection, planning or writes. Say that the Excel
+update follows. Then continue the authorised workbook update in the same turn,
+without asking for another confirmation, using
 [shared-workbook.md](references/shared-workbook.md). This is the default output,
 not an optional export. Export final scores >=80/100 by default; an explicit user
 selection may override the threshold for those named candidates only. Record the
-override privately and preserve the actual score. Keep the full chat
-ranking. Match the JD to an existing role sheet before creating any new sheet.
+override privately and preserve the actual score. The 60-point chat threshold
+does not lower the 80-point Excel threshold. Match the JD to an existing role sheet before creating any new sheet.
 Never add, rename or reorder headers on existing sheets. New sheets for unrelated
 roles must copy existing headers exactly. Missing columns are omitted from Excel;
 keep those fields in chat/private notes. Do not create Language flags or Ranking
 run columns, or insert their contents into other fields. Reuse the exact
 ranking data; do not reassess CVs for Excel.
-Report verified workbook updates or a concrete sync blocker with the chat list;
-never claim a failed or unverified write succeeded. Do not delay the ranking if
-Excel is unavailable. Reuse extracted text and update only affected assessments
-on revision.
+After Excel work, send a brief separate completion message reporting verified
+updates, no eligible changes, or a concrete sync blocker. Do not repeat the ranking
+or claim a failed or unverified write succeeded. Reuse extracted text and update
+only affected assessments on revision.

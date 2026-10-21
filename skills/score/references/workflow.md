@@ -1,4 +1,11 @@
-# Reuse evidence, then plan one workbook update
+# Reuse evidence, deliver the ranking, then update Excel
+
+Calculate all assessments privately. Send the chat ranking with only unrounded
+scores >=60/100 before starting Excel inspection or planning. Keep descriptions
+about fit and gaps only, with scores in separate fields. Then continue the Excel
+update using its existing >=80/100 threshold (or explicit candidate selection),
+and send a brief completion status after verification. No extra approval step is
+needed for this already authorised sequence.
 
 ## Extraction and assessment reuse
 
