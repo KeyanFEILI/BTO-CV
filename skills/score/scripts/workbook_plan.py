@@ -50,6 +50,7 @@ def plan(jobs, snapshot, selected_ids=()):
     mapping = columns(headers)
     require('candidate' in mapping and 'score' in mapping, 'Candidate and Match columns are required')
     require(len(set(headers)) == len(headers), 'Duplicate headers are ambiguous')
+    column_numbers = {header: index for index, header in enumerate(headers, 1)}
     source = snapshot['rows']
     row_numbers = [r['row'] for r in source]
     require(all(type(r) is int and r >= 2 for r in row_numbers)
@@ -100,7 +101,7 @@ def plan(jobs, snapshot, selected_ids=()):
                 raise ValueError(f'Preserve formula in {header}; resolve before writing')
             if value(old) == desired:
                 continue
-            col = headers.index(header) + 1
+            col = column_numbers[header]
             changes.append((col, value(old), desired))
             target['values'][header] = desired
         changes.sort()

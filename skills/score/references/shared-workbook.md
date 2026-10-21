@@ -9,9 +9,7 @@ If neither is configured, ask once for the shared workbook link and retain it
 in that private local configuration when authorised. Never guess the destination.
 A colleague must configure their own authorised link; no workbook is bundled.
 
-Only start workbook inspection, planning and writes after sending the chat ranking
-(final scores >=60/100). Continue the update in the same turn without another
-confirmation, then send a separate short Excel status. This also applies to revised
+Follow the chat-first sequence in [SKILL.md](../SKILL.md), including revised
 rankings. This is an in-task update, not a background watcher. Keep the link and
 candidate data private; do not put them in a public repository. Never change
 sharing permissions or send invitations. Other users need their own existing
@@ -89,8 +87,7 @@ Never inflate scores or silently lower the threshold. For automatic exports,
 use the unrounded calculator score, including its employer bonus. Without an
 explicit selection, do not add or update rows below 80. Never delete their
 pre-existing rows.
-The chat ranking includes only candidates scoring >=60; retain all assessments
-privately. This display threshold does not change Excel eligibility. Write
+The chat display threshold does not change Excel eligibility. Write
 every eligible listed candidate, not only the top five. If none qualifies, report
 that no candidate met the Excel threshold and leave the workbook unchanged,
 including not creating an empty sheet. Missing information means an empty cell,
