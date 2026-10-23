@@ -318,7 +318,11 @@ def build(data, output, template=None):
                 if job[key]:slot(key,job[key])
             if job['bullets']:
                 slot('responsibilities','Main responsibilities:')
-                for b in job['bullets']:slot('experience_bullet',b)
+                for b in job['bullets'][:-1]:slot('experience_bullet',b)
+                slot('experience_bullet',job['bullets'][-1])
+                spacing=body.lastChild.getElementsByTagNameNS(W,'spacing')
+                if not spacing:raise ValueError('Experience bullet spacing missing')
+                spacing[0].setAttributeNS(W,'w:after','0')
     if data['education']:
         heading(HEADINGS[1])
         for b in data['education']:slot('education_bullet',b)
