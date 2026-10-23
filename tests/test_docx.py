@@ -238,10 +238,10 @@ class NativeWordTests(unittest.TestCase):
    self.assertEqual(spacing.getAttribute('w:before'),'0');self.assertEqual(spacing.getAttribute('w:after'),'80')
    section=doc.getElementsByTagNameNS(W,'pgSz')[0]
    self.assertEqual(section.getAttribute('w:w'),'11906');self.assertEqual(section.getAttribute('w:h'),'16838')
-   for p in paras:
-    if p.getElementsByTagNameNS(W,'numPr'):
-     spacing=p.getElementsByTagNameNS(W,'spacing')[0]
-     self.assertEqual(spacing.getAttribute('w:after'),'10');self.assertEqual(spacing.getAttribute('w:line'),'228')
+   for key,after in [('First','100'),('Last','0'),('Next','0'),('English','10')]:
+    spacing=bytext[key].getElementsByTagNameNS(W,'spacing')[0]
+    self.assertEqual(spacing.getAttributeNS(W,'after'),after)
+    self.assertEqual(spacing.getAttributeNS(W,'line'),'228')
  def test_reject_legacy_master(self):
   with tempfile.TemporaryDirectory() as tmp:
    template=Path(tmp)/'legacy.docx'
